@@ -1,7 +1,7 @@
 ---
-layout: post
+layout: page
 title: Welcome to LBVR Games
-author: wout
+permalink: /
 ---
 
 Welcome to LBVR Games! We're glad you found your way to this little corner of the internet. Our goal is to bring together (location-based) virtual reality enthusiasts who want to join us in our quest (pun intended!) to foster a community of like-minded creators.
