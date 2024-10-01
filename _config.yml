@@ -2,7 +2,7 @@
 title:               LBVR Games
 tagline:             '- Welcome to our community'
 description:         'Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.'
-url:                 'https://www.lbvrgames.com/'
+url:                 'https://www.lbvrgames.com'
 baseurl:             ''
 permalink:           /:categories/:title
 
