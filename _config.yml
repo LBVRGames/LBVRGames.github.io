@@ -4,8 +4,7 @@ tagline:             '- Welcome to our community'
 description:         'Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.'
 url:                 'https://lbvrgames.github.io/'
 baseurl:             ''
-paginate:            5
-permalink:           pretty
+permalink:           /:categories/:title/
 
 # About/contact
 authors:
@@ -15,7 +14,7 @@ authors:
     email:             wout@lbvrgames.com
   bart:
     name:              Bart Stukken
-    url:               https://0x42.be/
+    url:               https://www.linkedin.com/in/bart-stukken/
     email:             bart@lbvrgames.com
 
 # Gems
