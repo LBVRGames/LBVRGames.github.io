@@ -170,13 +170,50 @@ pre {
   word-break: break-all;
   word-wrap: break-word;
   background-color: #f9f9f9;
-   overflow-x: auto; /* Allows horizontal scrolling if content is wider than the container */
+  overflow-x: auto; /* Allows horizontal scrolling if content is wider than the container */
 }
 pre code {
   padding: 0;
   font-size: 100%;
   color: inherit;
   background-color: transparent;
+}
+
+/* Styling for the code container */
+.code-container {
+  margin-bottom: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+/* Styling for the banner above the code */
+.code-header {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  justify-content: flex-end; /* Align the button to the right */
+  background-color: #f9f9f9; /* Header background */
+  padding: 8px 10px;
+  color: white;
+}
+
+/* Style the copy button */
+.copy-btn {
+  background-color: white;
+  color: #007bff;
+  border: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.copy-btn:hover {
+  opacity: 1;
 }
 
 /* Pygments via Jekyll */
