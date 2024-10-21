@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Unreal Engine Networked Pistol C++ Implementation
+title: Unreal Engine networked pistol C++ implementation
 author: wout
 date: 2024-10-11 11:20:00 +0200
 category: [Tutorials]
@@ -16,53 +16,60 @@ published: false
 * IDE: Visual Studio 2022 Community Edition
 
 ## Summary
-This tutorial explains how to implement the pistol of the Unreal Engine's Virtual Reality (VR) template in C++. Since this tutorial assumes familiarity with the VR template, I will not explain its internal workings beyond what is necessary to understand the changes being made. By the end of this tutorial, you should have an understanding of how to implement networked VR objects in C++. If you have any questions, feel free to [email us](mailto:tutorials@lbvrgames.com).
+This tutorial explains how to implement a C++ version of the pistol from Unreal Engine's Virtual Reality (VR) template in a multiplayer environment. Since this tutorial assumes familiarity with the VR template, I will not explain its internal workings beyond what is necessary to understand the changes being made. By the end of this tutorial, you will understand how to implement networked VR objects using C++. If you have any questions, feel free to [email us](mailto:tutorials@lbvrgames.com).
+
+## Download multiplayer virtual reality template
+The C++ pistol will be integrated into the multiplayer virtual reality template, which you can download from the [Unreal Engine Marketplace](https://www.unrealengine.com/marketplace/en-US/store). A tutorial explaining the multiplayer implementation of this template can be found here [here](./unreal-engine-multiplayer-virtual-reality).
+
+Once you have downloaded the template, rename the project from MultiplayerVR.uproject to VRTutorial.uproject.
 
 ## Generate Visual Studio project files
-To open the Unreal Engine's Virtual Reality template in Visual Studio we can right-click on the **\*.uproject** name and select **Generate Visual Studio project files**. However, if we do this you will notice the following pop-up window appear.
+To open the multiplayer virtual reality template in Visual Studio, right-click on the  VRTutorial.uproject file and select Generate Visual Studio project files. However, when you do this, you will notice the following pop-up window appear.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/ErrorPop-Up.png" alt="Error pop-up window" title="Error pop-up">
 </div>
 
-The pop-up window let's us know that we cannot generate Visual Studio project files because the project doesn't contain any source code (i.e. C++ files). To mitigate this we can open the project in the Unreal Editor. Go to Tools > New C++ class... > Common Classes > None and click Next. In the following window there are a number of settings. Let's have a look at them.
+The pop-up window informs us that we cannot generate Visual Studio project files because the project doesn't contain any source code (i.e. C++ files). To resolve this, we can add C++ files through the Unreal Editor.
+
+## GrabType
+The first C++ file we will add is a header file containing the **CustomGrabType** enum. To do this, open the project in the Unreal Editor. Navigate to Tools > New C++ Class... > Common Classes > None, and click Next. In the following window, you will see a number of settings. Let's take a look at them.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/AddC++Class.png" alt="Add C++ class window" title="Add C++ class">
 </div>
 
-First, we can choose a class type. Notice that at the moment a class type is not selected and that it is not necessary to select one. However, once we select Private or Public we can toggle between these two options but we cannot deselect them both. This option defines in which folder the C++ files are placed. Before selection one of the options the path is **/PathToProjectDirectory/Source/\<ModuleName\>/MyClass.(h)(cpp)**. After selecting Public the header file will be placed in **/PathToProjectDirectory/Source/\<ModuleName\>/Public/MyClass.h** while the source file will be placed in **/PathToProjectDirectory/Source/\<ModuleName\>/Private/MyClass.h**. If you select Private both the header and source file are placed in **/PathToProjectDirectory/Source/\<ModuleName\>/Private/**.
+First, we can choose a class type. Notice that initially, no class type is selected, and it is not required to select one. However, once you choose either Private or Public, you can toggle between these two options, but you cannot deselect both. This option determines the folder where the C++ files are placed. Before selecting an option, the path is */PathToProjectDirectory/Source/\<ModuleName\>/MyClass.(h)(cpp)*. After selecting Public, the header file will be placed in */PathToProjectDirectory/Source/\<ModuleName\>/Public/MyClass.h*, while the source file goes to */PathToProjectDirectory/Source/\<ModuleName\>/Private/MyClass.h*. If you select Private, both the header and source files are placed in */PathToProjectDirectory/Source/\<ModuleName\>/Private/*.
 
-You are probably wondering what the difference is between the Private and Public options. If you hover over both options you will see a small description appear.
-* Public: A public class can be included and used inside other modules in addition to the module it resides in.
-* Private: A private class can only be included and used within the module it resides in.
+You might be wondering what the difference is between the Private and Public options. If you hover over each option, a small description appears:
+* **Public**: A public class can be included and used inside other modules in addition to the module it resides in.
+* **Private**: A private class can only be included and used within the module it resides in.
 
-A more elaborated explanation on the difference between both options is made on the [UE Cast](https://www.youtube.com/watch?v=T8D3AhNd9Ww&ab_channel=UECasts) YouTube channel. On the Unreal Engine forum [SaxonRah](https://forums.unrealengine.com/t/what-public-and-private-mean-on-c-wizard/50336/5) explains why you should use public and private classes.
+A more detailed explanation of the differences between these options can be found on [UE Casts](https://www.youtube.com/watch?v=T8D3AhNd9Ww&ab_channel=UECasts). Additionally, [SaxonRah](https://forums.unrealengine.com/t/what-public-and-private-mean-on-c-wizard/50336/5) discusses the reasons for using public and private classes on the Unreal Engine forum.
 
-The first class we will make is the CustomGrabType class. We will make this class Private. Next, we can name our class. Name it CustomGrabType. After the name field you will see a dropdown menu. This let's you select the target module for your new class. At the moment we only have one module so you can leave it as it is. The other options can be left on their default values. Finally, we can click on Create Class.
-
-## GrabType
-When the class is created we will see the message that we need to build the project from our IDE (i.e. Visual Studio).
+The first class we will create is the **CustomGrabType** class, which we will set as Private. Therefore, name the class **CustomGrabType**. After the name field, you will see a dropdown menu that allows you to select the target module for your new class. Since we currently have only one module, you can leave this as it is. The other options can remain at their default values. Finally, click on Create Class. Once the class is created, you will see a message indicating that you need to build the project from your IDE (i.e. Visual Studio).
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/BuildFromIDEPop-UpMessage.png" alt="Build from IDE pop-up message window" title="Build from IDE pop-up message">
 </div>
 
-Click OK. Next, a new message appears stating that our class is succesfully added but that we must recompile our module before it will appear in the Content Browser.
+Click OK. Next, a new message will appear, confirming that our class has been successfully added, but we must recompile our module before it will appear in the Content Browser.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/RecompilePop-UpMessage.png" alt="Recompile pop-up message window" title="Recompile pop-up message">
 </div>
 
-Click Yes. The Visual Studio project will be opened and both the CustomGrabType source and header files are displayed. To make sure everything compiles at this point, right-click on the project in the Solution Explorer and select Build. If you did not close the Unreal Editor prior to building while the build configuration is set to Development Editor then the following error will appear.
+Click Yes. The Visual Studio project will open, displaying both the source and header files for **CustomGrabType**. To ensure everything compiles correctly at this point, right-click on the project in the Solution Explorer and select Build. If you did not close the Unreal Editor before building and the build configuration is set to Development Editor, you may encounter the following error.
 
 ```
 The command ""C:\W\Epic Games\UE_5.4\Engine\Build\BatchFiles\Build.bat" VRTutorialEditor Win64 Development -Project="E:\Unreal Projects\VRTutorial\VRTutorial.uproject" -WaitMutex -FromMsBuild -architecture=x64" exited with code 6.
 ```
 
-Close the Unreal Editor and build the project again. Once the project is build you right-click again on the project but this time you select Debug > Start New Instance. This will launch the Development Editor if this is selected as the build configuration from the Solution Configurations list. Once this works you can close the Unreal Engine editor. The difference between Build and Start New Instance is that the former compiles the code but does not run it while the latter compiles the code, if necessary, and then runs it.
+Close the Unreal Editor and build the project again. Once the project is built, right-click on the project again, but this time select Debug > Start New Instance. This will launch the Development Editor, provided that this is selected as the build configuration from the Solution Configurations list. After confirming that it works, you can close the Unreal Engine editor.
 
-Since the CustomGrabType is just an enum value we can remove the source file and keep the header file. Remove the source file both in the Solution Explorer and in the source directory. The implementation of the CustomGrabType should look similar to this:
+The difference between Build and Start New Instance is that the former compiles the code without running it, while the latter compiles the code (if necessary) and then runs it. You can also click on Local Windows Debugger at the top. This performs the same function as Start New Instance. The only difference is that you can run only one instance with Local Windows Debugger, whereas Start New Instance allows multiple instances.
+
+Since **CustomGrabType** is just an enum, we can remove the source file and keep only the header file. Remove the source file from both the Solution Explorer and the source directory. The implementation of **CustomGrabType** should resemble the following:
 
 ```c
 // Fill out your copyright notice in the Description page of Project Settings.
@@ -81,36 +88,29 @@ enum class ECustomGrabType : uint8
 };
 ```
 
-Let's break this down.
-* `#pragma once` makes sure that this header file is included only once to adhere to the One Definition Rule and avoid issues such as circular dependencies. It is not part of the C++ language standard, but rather a compiler extension. However, it has become widely adopted and is considered a best practice for header file inclusion in modern C++ development. Another techique would be to use header guards (i.e. `#ifndef`, `#define` and `#endif`). The difference between the two is that `#pragma once` offers a simpler syntax, improved readability, and potential compilation efficiency, while header guards are more portable and guaranteed to work on any compliant compiler.
-* The line `#include "CustomGrabType.generated.h"` includes another header file called `CustomGrabType.generated.h` which is generated by the [UnrealHeaderTool](https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-header-tool-for-unreal-engine). the UnrealHeaderTool is a command-line tool used by Unreal Engine to generate additional code and metadata for Unreal Engine types defined in header files.  
-* The line `UENUM(BlueprintType)` is a macro provided by Unreal Engine. It is used to define an enumeration that can be used in Unreal Engine's Blueprint visual scripting system.
-* The line `enum class ECustomGrabType : uint8` starts the definition of the enumeration `ECustomGrabType`. It specifies that `ECustomGrabType` is an enumeration with a fixed underlying type of `uint8`, which means it can hold values from 0 to 255. Notice that the class name is not `CustomGrabType` but `ECustomGrabType`. This is done to adhere to the Epic C++ Coding [Standard](https://dev.epicgames.com/documentation/en-us/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine) for Unreal Engine.
-* The subsequent lines define the individual enumeration values: `None`, `Free`, `Snap`, and `Custom`. Each value is assigned a display name using the `UMETA(DisplayName = "...")` macro. These display names are used for better readability and can be accessed in Unreal Engine's Blueprint system.
+Build the project to include the **CustomGrabType**.
 
-Build the project to include the CustomGrabType.
+### Time to explain a few things
+I will not explain every aspect of this class, but it's worth noting that the Unreal Engine utilizes macros that are not part of the C++ language standard. Let’s break this down:
+
+The line `#include "CustomGrabType.generated.h"` includes another header file called `CustomGrabType.generated.h`, which is generated by the [UnrealHeaderTool](https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-header-tool-for-unreal-engine). This command-line tool is used by the Unreal Engine to generate additional code and metadata for Unreal Engine types defined in header files.
+
+The line `UENUM(BlueprintType)` is a macro provided by the Unreal Engine. It defines an enumeration that can be utilized in Unreal Engine's Blueprint visual scripting system.
+
+The line `enum class ECustomGrabType : uint8` begins the definition of the enumeration `ECustomGrabType`. This declaration specifies that `ECustomGrabType` is an enumeration with a fixed underlying type of `uint8`, allowing it to hold values ranging from 0 to 255. Note that the class name is prefixed with an "E" (i.e. `ECustomGrabType`) instead of simply being called `CustomGrabType`. This naming convention follows the Epic C++ [Coding Standard](https://dev.epicgames.com/documentation/en-us/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine) for Unreal Engine.
+
+The subsequent lines define the individual enumeration values: `None`, `Free`, `Snap`, and `Custom`. Each value is assigned a display name using the `UMETA(DisplayName = "...")` macro. These display names enhance readability and can be accessed within Unreal Engine's Blueprint system.
 
 ## GrabComponent
-Next, we are going to implement the GrabComponent in C++. Let's start with opening our project in the Unreal Editor. This time go to Tools > New C++ Class... > Common Classes > Scene Component and click Next. Set the class type to Private and name the class CustomGrabComponent. Click on Create Class. Visual Studio will open and probably you have to reload your project files. Build your project. If you didn't start the Unreal Editor from Visual Studio by starting a new instance but clicked on the project file in your file explorer or started the editor from the Epic Games Launcher then you probably receive the following error.
+Next, we will implement the **GrabComponent** in C++. Begin by opening your project in the Unreal Editor. Navigate to Tools > New C++ Class... > Common Classes > Scene Component and click Next. Set the class type to Private and name the class **CustomGrabComponent**. Then, click Create Class.
+
+Visual Studio will open, and you may need to reload your project files. After that, build your project. If you did not start the Unreal Editor from Visual Studio by selecting Start New Instance, but instead opened the project file from your file explorer or launched the editor from the Epic Games Launcher, you might encounter the following error:
 
 ```
 The command ""C:\W\Epic Games\UE_5.4\Engine\Build\BatchFiles\Build.bat" VRTutorialEditor Win64 Development -Project="E:\Unreal Projects\VRTutorial\VRTutorial.uproject" -WaitMutex -FromMsBuild -architecture=x64" exited with code 6.
 ```
 
-To resolve this error, close your editor and build the project again. If the C++ Classes folder doesn't appear in the Content Drawer then open the *.uproject file and add the following:
-```
-"Modules": [
-	{
-		"Name": "VRTemplate",
-		"Type": "Runtime",
-		"LoadingPhase": "Default",
-		"AdditionalDependencies": [
-			"Engine"
-		]
-	}
-],
-```
-Replace VRTemplate with the name of your project. A quick shout out to [fkrstevski](https://forums.unrealengine.com/t/c-classes-not-showing-up-in-content-browser/86053/24) for this solution.
+To resolve this error, close the Unreal Editor and build the project again.
 
 ### CustomGrabComponent.h
 ```c
@@ -438,50 +438,93 @@ void UCustomGrabComponent::ClientPlayOnGrabHapticEffect_Implementation()
 }
 ```
 
-When you compile your code the following linker error appears:
+When you compile your code, the following linker error appears:
 
 ```
 unresolved external symbol "__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UMotionControllerComponent_NoRegister(void)" (__imp_?Z_Construct_UClass_UMotionControllerComponent_NoRegister@@YAPEAVUClass@@XZ) referenced in function "void __cdecl `dynamic initializer for 'public: static struct UECodeGen_Private::FObjectPropertyParams const Z_Construct_UFunction_UCustomGrabComponent_ClientSetMotionControllerRefAndOwner_Statics::NewProp_MotionController''(void)" (??__E?NewProp_MotionController@Z_Construct_UFunction_UCustomGrabComponent_ClientSetMotionControllerRefAndOwner_Statics@@2UFObjectPropertyParams@UECodeGen_Private@@B@@YAXXZ)	
 
 ```
 
-This means that the definition for UMotionController could not be found. The class UMotionController is defined in the [HeadMountedDisplay](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/HeadMountedDisplay) module. This module can be added to the private dependency module names in the *.Build.cs file.
+This error indicates that the definition for `UMotionControllerComponent` could not be found. The class `UMotionControllerComponent` is defined in the [`HeadMountedDisplay`](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/HeadMountedDisplay) module. To resolve this, you need to add this module to the `PrivateDependencyModuleNames` array in the VRTutorial.Build.cs file.
+
+```c#
+// Fill out your copyright notice in the Description page of Project Settings.
+
+using UnrealBuildTool;
+
+public class VRTutorial : ModuleRules
+{
+	public VRTutorial(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+
+		PrivateDependencyModuleNames.AddRange(new string[] { "HeadMountedDisplay" });
+
+		// Uncomment if you are using Slate UI
+		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+
+		// Uncomment if you are using online features
+		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+
+		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+	}
+}
+```
+
+After adding the module and recompiling your code, the linker error should be resolved. If the C++ Classes folder does not appear in the Content Browser, open the VRTutorial.uproject file in a text editor and add the following:
 
 ```
-PrivateDependencyModuleNames.AddRange(new string[] { "HeadMountedDisplay" });
+"Modules": [
+	{
+		"Name": "VRTutorial",
+		"Type": "Runtime",
+		"LoadingPhase": "Default",
+		"AdditionalDependencies": [
+			"Engine"
+		]
+	}
+],
 ```
+If you didn't name the project VRTutorial, replace it with your project's name. A quick shoutout to [fkrstevski](https://forums.unrealengine.com/t/c-classes-not-showing-up-in-content-browser/86053/24) for this solution.
 
-When you compile your code again the linker error should be resolved.
+### Time to explain a few things
+When you examine the **CustomGrabComponent** code, you'll notice it closely resembles the Blueprint **GrabComponent** from our [previous tutorial](./unreal-engine-multiplayer-virtual-reality). However, this time we set the entire **MotionControllerRef** on the client side, instead of just the result of the **GetHeldByHand** function.
 
-### Time To Explain A Few Things
-If you look at the CustomGrabComponent code then you will notice that it looks almost the same as the Blueprint GrabComponent of our [previous tutorial](./unreal-engine-multiplayer-virtual-reality). However, this time we set the entire MotionControllerRef on the client side instead of only the result of the GetHeldByHand() function.
-
-To explain how I ended up with the current implementation and why we should better use the approach from the previous tutorial we need to establish a baseline from where to start. In the previous tutorial we set the result of the GetHeldByHand() function on the client side as follow.
+To explain how I arrived at the current implementation and why we should use the approach from the previous tutorial instead, we need to establish a starting point. In the previous tutorial, we set the result of the **GetHeldByHand** function on the client side as follows.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/OnGrabbedAndOnDroppedFromPreviousTutorial.png" alt="Blueprint OnGrabbed and OnDropped events in the Pistol event graph from the previous tutorial" title="On grabbed and on dropped from previous tutorial">
 </div>
 
-If we replicate the MotionControllerRef variable from the CustomGrabComponent class then we don't need to pass the result of the GetHeldByHand() function to the GrabOnOwningClient and DropOnOwningClient RPCs. This simplifies things on the side of the Pistol event graph.
+By replicating the **MotionControllerRef** variable from the **CustomGrabComponent** class, we eliminate the need to pass the result of the **GetHeldByHand** function to the **GrabOnOwningClient** and **DropOnOwningClient** RPCs. This simplifies the logic on the **Pistol** event graph
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/PistolNetworkedOnGrabbedAndOnDropped.png" alt="A simplified version of the Blueprint OnGrabbed and OnDropped events in the Pistol event graph" title="Pistol networked on grabbed and on dropped">
+    <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/PistolNetworkedOnGrabbedAndOnDropped.png" alt="A simplified version of the Blueprint OnGrabbed and OnDropped events in the Pistol event graph" title="Simplified on grabbed and on dropped">
 </div>
 
-To replicate the MotionControllerRef variable from the CustomGrabComponent class we need to add Replicated to the UPROPERTY. Although the property will be replicated there is no guarantee that the replication happens before the GrabOnOwningClient RPC is called, and therefore before the GetHeldByHand() function in the Pistol's event graph, despite that the MotionControllerRef is set before the OnGrabbed event dispatcher is called in the TryGrab function.
+To replicate the **MotionControllerRef** variable from the **CustomGrabComponent** class, we need to add the `Replicated` specifier to the `UPROPERTY`. However, even though the property will be replicated, there is no guarantee that the replication will occur before the **GrabOnOwningClient** RPC is called, or before the **GetHeldByHand** function is executed in the **Pistol**’s event graph. This can happen even though the **MotionControllerRef** is set before the **OnGrabbed** event dispatcher is called in the **TryGrab** function.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/TryGrabFromPreviousTutorial.png" alt="Blueprint TryGrab function from the previous tutorial" title="Try grab from previous tutorial">
 </div>
 
-If the GetHeldByHand() function is called while the MotionControllerRef is not yet set on the client side then this results in a "No owning client for ... " warning.
+If the **GetHeldByHand** function is called before the **MotionControllerRef** is set on the client side, it will result in the following warning and error:
+
+```
+LogScript: Warning: Accessed None trying to read property MotionControllerRef
+    GrabComponent_C /Game/VRTemplate/Maps/UEDPIE_1_VRTemplateMap.VRTemplateMap:PersistentLevel.Pistol_00.GrabComponentSnap
+    Function /Game/VRTemplate/Blueprints/GrabComponent.GrabComponent_C:GetHeldByHand:0047
+PIE: Error: Blueprint Runtime Error: "Accessed None trying to read property MotionControllerRef". Node:  Return Node Graph:  GetHeldByHand Function:  Get Held by Hand Blueprint:  GrabComponent
+```
 
 #### RepNotify to the rescue!
-To make sure that the MotionControllerRef is set before the OnGrabbed event dispatcher is called we can use a RepNotify. The RepNotify function can then be used to call a server RPC which calls the OnGrabbed event dispatcher. At this point you should already stop me because as you probably start to notice we are going to perfrom two network calls for something that we did previously with only one network call. But you [can't stop me now](https://www.youtube.com/watch?v=RKmKEow9ues&ab_channel=%21K7Records) we are at the entrance of a very interesting rabbit hole.
+To ensure that the **MotionControllerRef** is set before the **OnGrabbed** event dispatcher is called, we can use a **RepNotify**. This **RepNotify** function can then trigger a server RPC that calls the **OnGrabbed** event dispatcher. At this point, you might want to stop me, as you may have started to notice that we are going to perform two network calls for something we previously accomplished with just one. But you [can't stop me now](https://www.youtube.com/watch?v=RKmKEow9ues&ab_channel=%21K7Records). We are at the entrance of a very interesting rabbit hole.
 
-First of all there is a difference between a RepNotify in Blueprint and C++. In Blueprint the RepNotify is executed on both the client and the server. However, in C++ the RepNotify is only executed on the clients. Also, when the variable is not changed then the RepNotify is not called. This is the case for both Blueprint and C++. However, in C++ you can force the RepNotify to be executed on every single call even when the variable doesn't change. This can be done by setting the flag REPNOTIFY_Always in the DOREPLIFETIME_CONDITION_NOTIFY() function.
+First, it’s important to note the [differences](https://vorixo.github.io/devtricks/stateful-events-multiplayer/#onreps) between **RepNotify** in Blueprint and C++. In Blueprint, the **RepNotify** is executed on both the client and the server. In contrast, in C++, the **RepNotify** is only executed on the clients. Additionally, if the variable remains unchanged, the **RepNotify** is not called in both Blueprint and C++. In C++, we can change a variable by setting a pointer to nullptr. In Blueprint, a variable can be cleared by setting it without any input. Unfortunately, when I attempted this method in both C++ and Blueprint, the **RepNotify** was not called, even though the variable's value had changed. However, in C++, you have the [option](https://dev.epicgames.com/documentation/en-us/unreal-engine/replicate-actor-properties-in-unreal-engine?application_version=5.4) to force the **RepNotify** to execute on every call, even when the variable doesn’t change. This can be achieved by setting the flag `REPNOTIFY_Always` in the `DOREPLIFETIME_CONDITION_NOTIFY()` function. This did the trick.
 
-Unfortunately, a RepNotify will not work. The reason is twofold. As I mentioned in the previous paragraphd the RepNotify will only be executed on the clients and not on the server in C++. A possible solution would be to call the RepNotify function manually for the client acting as the listen server. However, it is not possible to distinguish between a "normal" client and the listen server client. Therefore, you have to call the RepNotify for every client. You can see the call hierarchy in the following code snippet.
+Unfortunately, a **RepNotify** will not work in this scenario for two reasons. First, as mentioned earlier, the **RepNotify** is executed only on the clients and not on the server in C++. A potential solution might be to call the **RepNotify** function manually for the client acting as the listen server. However, it's impossible to distinguish between a "normal" client and the listen server client, which means you would need to call the **RepNotify** for every client. You can see the call hierarchy in the following code snippet.
 
 ```c
 bool UCustomGrabComponent::TryGrab(UMotionControllerComponent* MotionController, AActor* Actor)
@@ -549,18 +592,17 @@ const EControllerHand UCustomGrabComponent::GetHeldByHand() const
 }
 ```
 
-Problem solved! Right? Well, not exactly. You see the RepNotify function is called when the MotionControllerRef is set on the client. If we call the RepNotify function manually then the function can be executed before the MotionControllerRef is set. This is not a problem for the listen server client because the MotionControllerRef is set already on the server and therefore also on the client because they are the same. However, for the other clients it is not this simple. There is the chance that the replicated variable is not yet set on the client and is already requested on the client side (see GetHeldByHand() function) resulting in a crash (nullptr). On the listen server you would not have this problem since the replicated variable is set on the server and therefore directly accesable by the client. But what if we just make the distinction between the listen server client and the other clients and only call the RepNotify function for the listen server client? Well, on paper it is a good idea. Unfortunately, it is not possible to distinguish between a “normal” client and the listen server client.  
+Problem solved, right? Well, not exactly. The **RepNotify** function is called when the **MotionControllerRef** is set on the client. If we manually call the **RepNotify** function, it can be executed before the **MotionControllerRef** is set. This isn't an issue for the listen server client, as the **MotionControllerRef** is already set on the server and, consequently, on the client since they are the same. However, it becomes more complicated for other clients. There’s a chance that the replicated variable is not yet set on those clients when it's requested (as seen in the `GetHeldByHand()` function), which could lead to a crash due to a nullptr. While the listen server doesn't face this problem, as the replicated variable is set on the server and directly accessible by the client, distinguishing between the listen server client and other clients to call the **RepNotify** function selectively is not feasible.
 
-Remember that I said that there are two reasons why a RepNotify will not work? So far we have only covered the first reason. Don't worry I will keep it short for the second reason. The RepNotify function needs to call the server RPC responsible for calling the OnGrabbed event dispatcher. This server RPC will be called for the client acting as the listen server but for the other clients the server RPC will not be executed. The reason is because the owner of the CustomGrabComponent's owner is not set on these clients. And since RepNotify functions can't have parameters we can't pass an owner to the be set on the client-side. 
-
+Remember when I mentioned that there are two reasons why a **RepNotify** will not work? So far, we've only covered the first reason. Don't worry! I’ll keep it brief for the second reason. The **RepNotify** function needs to call the server RPC responsible for calling the **OnGrabbed** event dispatcher. This server RPC will be executed for the client acting as the listen server, but it won't run for other clients. The issue arises because the owner of the **CustomGrabComponent**'s owner is not set on these clients. Furthermore, since **RepNotify** functions cannot have parameters, we cannot pass an owner to be set on the client side.
 
 #### RPCs then?
-The only viable option that remains is to use a RPC that runs on the owning client, sets the owner and calls the server RPC on a successful grab. On a succesful drop a RPC runs on the owning client to remove the owner.
+The only viable option left is to use an RPC that runs on the owning client, sets the owner, and calls the server RPC upon a successful grab. Similarly, on a successful drop, an RPC runs on the owning client to remove the owner.
 
-By now you probably see why it would be a lot easier and also better to just sent the GetHeldByHand() result as an argument with the GrabOnOwningClient and DropOnOwningClient RPCs.
+By now, you can probably see why it would be much easier and better to simply send the result of the **GetHeldByHand** function as an argument with the **GrabOnOwningClient** and **DropOnOwningClient** RPCs.
 
 ## Pistol
-Next, we are going to implement the Pistol in C++. Let's start with opening our project in the Unreal Editor. This time go to Tools > New C++ Class... > Common Classes > Actor and click Next. Set the class type to Public and name the class CustomPistol. Click on Create Class. Visual Studio will open and probably you have to reload all your project files. Build your project.
+Next, we will implement the **Pistol** in C++. Begin by opening your project in the Unreal Editor. Navigate to Tools > New C++ Class... > Common Classes > Actor, then click Next. Set the class type to Public and name the class **CustomPistol**. Click Create Class. Visual Studio will open, and you may need to reload all the project files. Once that's done, build the project.
 
 ### CustomPistol.h
 
@@ -916,31 +958,32 @@ void ACustomPistol::ClientPlayPistolFireHapticEffect_Implementation()
 }
 ```
 
-If you try to build your project at this point then you will get the following error:
+If you try to build your project at this point, you will get the following error:
 
 ```
 Cannot open include file: 'EnhancedInputSubsystems.h': No such file or directory
 ```
-To resolve this you need to add `"EnhancedInput"` to `PublicDependencyModuleNames` in the MyProject.Build.cs.
+
+To resolve this, you need to add `"EnhancedInput"` to `PublicDependencyModuleNames` in the VRTutorial.Build.cs file.
 
 ```c#
 // Fill out your copyright notice in the Description page of Project Settings.
 
 using UnrealBuildTool;
 
-public class Construct : ModuleRules
+public class VRTutorial : ModuleRules
 {
-	public Construct(ReadOnlyTargetRules Target) : base(Target)
+	public VRTutorial(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
+
 		PublicDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "Core", "CoreUObject", "Engine", "InputCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "HeadMountedDisplay" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
@@ -949,28 +992,31 @@ public class Construct : ModuleRules
 }
 ```
 
-(Regenerate Visual Studio Project files after changing *.Build.cs) -> Not sure if necessary.
+Once you have done this, recompile your code.
 
-### Time To Explain A Few Things
+### Time to explain a few things
+The **IMC_Default**, **IMC_Hands**, **IMC_Menu**, **IMC_Weapon_Left**, and **IMC_Weapon_Right** contexts are applied immediately when the Enhanced Input subsystem is ready. To prevent automatic addition of Input Mapping Contexts, you can disable 'Add Immediately' under Enhanced Input in the Project Settings, as we manage the mapping contexts manually.
 
-The IMC_Default, IMC_Hands, IMC_Menu, IMC_Weapon_Left and IMC_Weapon_Right are applied immediately when the EI subsystem is ready. We can disable add immediately for Input Mapping Contexts in Project Settings under Enhanced Input since we add the mapping contexts ourselves.
+<div align="center">
+    <img src="/assets/images/NetworkedPistolC++/CustomPistol/InputMappingContextsAddImmediatelyDisabled.png" alt="Unreal Editor project settings where add immediately is disabled for the input mapping contexts" title="Input mapping contexts add immediately disabled">
+</div>
 
-Notice that in the RemovePistolInputActions() function the binding handles are used to remove the pistol's input actions. When I was working on the C++ Pistol I ran into a fault where the input actions were bind twice. As a result the ShootLeftBindingHandle and ShootRightBindingHandle were overwritten in the BindPistolInputActions() function. Therefore, when removing the input actions not all handles were removed. As a result when you grab the right weapon first, release the weapon and then grab the left weapon then a handle is still present for the right weapon and when you try to shoot this handle will call the ServerShootRight() function. This function calls the GetHeldByHand() function which uses the MotionControllerRef to determine by which hand the pistol is held. However, the MotionControllerRef is set to a nullptr when you dropped the right weapon and therefore the program crashed. To mitigate such errors you can opt to clear all bindings for the pistol object. The code snippet for this is placed in comment in the RemovePistolInputActions() function.
+Notice that in the `RemovePistolInputActions()` function, the binding handles are used to remove the pistol's input actions. While working on the C++ **Pistol**, I encountered a bug where the input actions were bound twice. As a result, the `ShootLeftBindingHandle` and `ShootRightBindingHandle` were overwritten in the `BindPistolInputActions()` function. This led to not all handles being properly removed when removing input actions. For example, if you grab the right weapon first, release it, then grab the left weapon, the handle for the right weapon remains. When you attempt to shoot, the lingering handle still calls the `ServerShootRight()` function. This function calls `GetHeldByHand()`, which uses `MotionControllerRef` to determine which hand holds the pistol. However, since `MotionControllerRef` is set to nullptr after dropping the right weapon, the program crashes. To prevent such errors, you can opt to clear all bindings for the pistol object. A code snippet for this solution is commented out in the `RemovePistolInputActions()` function.
 
-Another issue that I ran into was that if a CustomPistol was duplicated inside the Unreal Editor then for some reason you could not shoot with the duplicated pistol (i.e. no projectiles were spawned). It turned out that this was related to the OnGrabbed delegate. Calling the AddDynamic() function in the BeginPlay() function instead of the constructor seemed to fix the issue. I came accros the solution [here](https://forums.unrealengine.com/t/adddynamic-not-working/299247/13).
+Another issue I encountered was that if a **CustomPistol** was duplicated inside the Unreal Editor, you couldn't shoot with the duplicated pistol (i.e. no projectiles were spawned). This problem was related to the **OnGrabbed** delegate. Moving the `AddDynamic()` function call from the constructor to the `BeginPlay()` function appeared to resolve the issue. I came across the solution [here](https://forums.unrealengine.com/t/adddynamic-not-working/299247/6).
 
-### Update The Blueprint Code
-So far we have created a C++ networked pistol. However, if we use this weapon to replace the Blueprint version and you try to grab our CustomPistol then you will notice that nothing happens. Why is that? Well, when we try to grab an object only objects which have a grab component of the class GrabComponent are taken in consideration. A correct approach would be to create a GrabComponent base class and make the CustomGrabComponent and the Blueprint GrabComponent derived classes from this base class. However, for now I will just replace the Blueprint GrabComponent references by CustomGrabComponent. To do this set ComponentClass parameter of the GetComponentsByClass function in the GetGrabComponentNearMotionController function of the VRPawn class to CustomGrabComponent.
+### Update the Blueprint code
+So far, we have created a C++ networked pistol. However, if you replace the Blueprint version with our **CustomPistol** and try to grab it, you will notice that nothing happens. Why is that? When attempting to grab an object, only those with a grab component of the class **GrabComponent** are considered. A better approach would be to create a base class for **GrabComponent** and derive both **CustomGrabComponent** and the Blueprint **GrabComponent** from it. However, for now, I will simply replace the Blueprint **GrabComponent** references with **CustomGrabComponent**. To do this, set the **ComponentClass** parameter of the **GetComponentsByClass** function in the **GetGrabComponentNearMotionController** function of the **VRPawn** class to **CustomGrabComponent**.
 
 <div align="center">
     <img src="/assets/images/NetworkedPistolC++/UpdateTheBlueprintCode/ChangeComponentClass.png" alt="Blueprint code of the GetGrabComponentNearMotionController function of the VRPawn class where the ComponentClass argument of the GetComponentsByClass function is changed to CustomGrabComponent" title="Change component class">
 </div>
 
-If we compile the Blueprint code we will get errors that CustomGrabComponent is not compatible with GrabComponent. Resolve all errors one by one. This includes updating all references to GrabComponent in the GetGrabComponentNearMotionController function and the VRPawn event graph.
+If we compile the Blueprint code, we will encounter errors indicating that **CustomGrabComponent** is not compatible with **GrabComponent**. To resolve these errors, address them one by one. This process includes updating all references to **GrabComponent** in the **GetGrabComponentNearMotionController** function and the event graph of the **VRPawn**.
 
-When you have fixed all the errors and run the project you will notice that the pistols don't snap to you hand as they used to. This is because the GrabType is set to Free by default and since the original GrabComponent Blueprint didn't have a SetGrabType() function I didn't implement this in C++. Therefore, the GrabType need to be set in the Unreal Editor. You can do this by clicking on the pistol in your level and search for GrabType in the details panel and set it to Snap.
+Once you've resolved all the errors and run the project, you will notice that the pistols don't snap to your hand as they used to. This occurs because the **GrabType** is set to **Free** by default, and since the original **GrabComponent** Blueprint didn't include a **SetGrabType** function, I did not implement it in C++. Therefore, you will need to set the **GrabType** in the Unreal Editor. To do this, click on the pistol in your level, search for **GrabType** in the Details panel, and set it to **Snap**.
 
-Another thing you may have observed is that the collision profile name is set to PhysicsActor for the SkeletalMeshGun in the CustomPistol constructor. However, in the CustomGrabComponent BeginPlay() function this is done again and in the case of the pistol the SkeletalMeshGun is the parent of the CustomGrabComponent so the collision profile name is set again to PhysicsActor. As a result I thought I could remove the SetCollisionProfileName call in the CustomPistol constructor. However, when I did this then the function call to IsAnySimulatingPhysics() in the SetShouldSimulateOnDrop() function returned false although the SetSimulatePhysics(true) is called for the SkeletalMeshGun in the CustomPistol constructor.
+Another thing you may have noticed is that the collision profile name for the `SkeletalMeshGun` is set to `PhysicsActor` in the **CustomPistol** constructor. However, this is repeated in the `BeginPlay()` function of **CustomGrabComponent**, as the `SkeletalMeshGun` is the parent of **CustomGrabComponent**. This led me to believe I could remove the `SetCollisionProfileName` call from the **CustomPistol** constructor. However, when I did so, the function call to `IsAnySimulatingPhysics()` in the `SetShouldSimulateOnDrop()` function returned false, even though `SetSimulatePhysics(true)` is called for the `SkeletalMeshGun` in the **CustomPistol** constructor.
 
 ```c
 bool USkeletalMeshComponent::IsAnySimulatingPhysics() const
@@ -987,15 +1033,16 @@ bool USkeletalMeshComponent::IsAnySimulatingPhysics() const
 }
 ```
 
-The reason is that the Bodies array is empty. However, if we set the collision profile name to PhysicsActor for the SkeletalMeshGun in the CustomPistol constructor then the Bodies array is not empty. At the moment I don't know exactly why this happens. So if you know this please reach out.
+The reason for this behavior is that the `Bodies` array is empty. However, when we set the collision profile name to `PhysicsActor` for the `SkeletalMeshGun` in the **CustomPistol** constructor, the `Bodies` array is populated. At this point, I am not entirely sure why this occurs. If you have insights on this, please reach out.
 
-## Grabbable Small Cube
-Since, we are know only looking for the CustomGrabComponent to grab objects the grabbable small cubes are no longer grabbable. To resolve this we can replace the GrabComponent of the Grabbable_SmallCube to CustomGrabComponent. Or we can duplicate the Grabbable_SmallCube and replace the GrabComponent with CustomGrabComponent in the duplicated version. The cubes in the VRTemplate level can then be replaced with the duplicated version. To do this follow these steps:
-1. Duplicate the Grabbable_SmallCube Blueprint and rename it to Custom_Grabbable_SmallCube.
-2. Add the CustomGrab as a component and rename it to CustomGrabComponent.
-3. Set the scale of the CustomGrabComponentSnap to the same as GrabComponent.
-4. Delete the GrabComponent.
-5. Compile the Custom_Grabbable_SmallCube Blueprint class.
-6. Select all instances of the Grabbable_SmallCube in the Outliner on the right-hand side of the VRTemplateMap. Right-click on the selected items > Replace Selected Actors with > Custom_Grabbable_SmallCube. If the [scale values](https://forums.unrealengine.com/t/replace-selected-actor-does-not-apply-scale-values/1902492) are not applied correctly then you need to replace the actors manually.
+## Grabbable_SmallCube
+Since we are now only looking for the **CustomGrabComponent** to grab objects, the **Grabbable_SmallCube** instances are no longer grabbable. To resolve this, we can either replace the **GrabComponent** of the **Grabbable_SmallCube** with **CustomGrabComponent** or duplicate the **Grabbable_SmallCube** and update the component in the duplicated version. The cubes in the **VRTemplateMap** can then be replaced with the duplicated version. We will opt for the latter option. To do this, follow these steps:
 
-The Cube_FireLogs and the SM_Ball_01 also have a grab component but don't have a Blueprint class. If you want to be able to grab those than select them in the Outliner of the VRTemplateMap and replace the GrabComponent with a CustomGrabComponent in their respective details panels.
+1. Duplicate the **Grabbable_SmallCube** Blueprint and rename it to **Custom_Grabbable_SmallCube**.
+2. Add the **CustomGrab** as a component and rename it to **CustomGrabComponent**.
+3. Set the scale of the **CustomGrabComponent** to match that of the original **GrabComponent**.
+4. Delete the **GrabComponent**.
+5. Compile the **Custom_Grabbable_SmallCube** Blueprint class.
+6. In the Outliner on the right-hand side of the **VRTemplateMap**, select all instances of the **Grabbable_SmallCube**. Right-click on the selected items and choose Replace Selected Actors with > **Custom_Grabbable_SmallCube**. If the [scale values](https://forums.unrealengine.com/t/replace-selected-actor-does-not-apply-scale-values/1902492) are not applied correctly, you may need to replace the actors manually or adjust the scale manually. The latter option is likely to require less work.
+
+The **Cube_FireLogs** and **SM_Ball_01** also have a grab component but do not have a Blueprint class. If you want to make these objects grabbable, select them in the Outliner of the **VRTemplateMap** and replace the **GrabComponent** with a **CustomGrabComponent** in their respective details panels.
