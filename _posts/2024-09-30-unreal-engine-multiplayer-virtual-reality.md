@@ -15,7 +15,7 @@ published: false
 * UE:  5.4
 
 ## Summary
-This tutorial explains how to extend the Unreal Engine's Virtual Reality (VR) template to support multiplayer. Since this tutorial assumes familiarity with the VR template, I will not explain its internal workings beyond what is necessary to understand the changes being made. By the end of this tutorial, you should have the fundamentals to start developing free-roam and multiplayer free-room VR content. If you have any questions, feel free to [email us](mailto:tutorials@lbvrgames.com).
+This tutorial explains how to extend the Unreal Engine's Virtual Reality (VR) template to support multiplayer. Since this tutorial assumes familiarity with the VR template, I will not explain its internal workings beyond what is necessary to understand the changes being made. By the end of this tutorial, you will have the fundamentals to start developing free-roam and multiplayer free-room VR content. If you have any questions, feel free to [email us](mailto:tutorials@lbvrgames.com).
 
 ## Project setup
 To start, launch the Unreal Engine, go to Games, and select Virtual Reality. Leave the default settings enabled, select the project location, and give it an appropriate name (e.g. MultiplayerVR). Next, click create.  
@@ -74,7 +74,7 @@ At this point, we could even disable the **Replicates** and **Replicate Movement
 
 Finally, we need to replicate the **Camera** component by selecting the **Component Replicates** option in the details panel. Otherwise, the relative position will only be set on the server, and the other clients will still see the pawn lying on the ground.
 
-### Snap Turn
+### Snap turn
 To rotate in increments of 45 degrees, which we will call a snap turn, the player can use the left thumbstick on the controller. The only function here is the **Snap Turn** function, which needs to be executed on the server. This function also has an input parameter called **Right Turn**, which is a boolean that decides if the player should turn right or left. For those interested, [Marco Ghislanzoni](https://www.youtube.com/watch?v=1rQvPnKvlfk) provides a good explanation of snap rotation in VR.
 
 <div align ="center">
@@ -95,7 +95,7 @@ The **VRPawn** corresponds to the player's start position, which in turn corresp
     <img src="/assets/images/VRPawn/SnapTurnWithNetworking.png" alt="Snap turn Blueprint code with networking" title="Snap turn with networking">
 </div>
 
-### Location-Based Virtual Reality
+### Location-based virtual reality
 At this point, it is possible to teleport and snap turn in a multiplayer environment. But what happens when we start walking and looking around without using our controllers to initiate these actions? Well, this is an interesting question. Remember that we saw earlier that the **Camera** has a relative offset with respect to the **VRPawn** and that the **Camera** is attached to our VR headset? This means that if we start walking around and/or rotating our head, the **Camera** will follow along. However, this happens only on the client's game instance. This implies that when a player starts to walk around, the position on this client's game instance differs from the server's game instance and the game instances of the other clients connected to the server. In other words, a position mismatch occurs. How do we cope with this, you may ask? Well, let's introduce the tick event. As stated in the [official documentation](https://dev.epicgames.com/documentation/en-us/unreal-engine/actor-ticking-in-unreal-engine?application_version=5.4), this event is used to update Actors each frame. To use the tick event, we need to make sure that the **Start with Tick Enabled** option is checked in the Class Defaults details panel of the **VRPawn**.
 
 <div align ="center">
@@ -155,14 +155,14 @@ You tested it, right? And let me guess—the other clients saw no hand animation
   </li>
 
   <li>
-    Notice that under the functions list, a new function named <em>OnRep_PoseAlpha...</em> is added. Inside this function, we include the logic that updates the hand animation.
+    Notice that under the functions list, a new function named <strong>OnRep_PoseAlpha...</strong> is added. Inside this function, we include the logic that updates the hand animation.
     <div align ="center">
         <img src="/assets/images/VRPawn/OnRepPoseAlphaGraspLeftHandFunction.png" alt="Blueprint code of the OnRep pose alpha grasp left hand function" title="OnRep pose alpha grasp left hand function">
     </div>
   </li>
 
   <li>
-    Set the new <em>PoseAlpha...</em> variable when the event is called.
+    Set the new <strong>PoseAlpha...</strong> variable when the event is called.
     <div align ="center">
         <img src="/assets/images/VRPawn/PoseAlphaGraspLeftOnServer.png" alt="Blueprint code of the pose alpha grasp left on server event" title="Pose alpha grasp left on server">
     </div>
