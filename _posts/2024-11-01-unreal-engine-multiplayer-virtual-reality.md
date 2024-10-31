@@ -2,9 +2,9 @@
 layout: post
 title: Unreal Engine multiplayer virtual reality
 author: wout
-date: 2024-09-30
+date: 2024-11-01
 category: [Tutorials]
-published: false
+published: true
 ---
 
 ## Setup
