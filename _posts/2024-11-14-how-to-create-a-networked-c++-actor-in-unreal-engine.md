@@ -1,10 +1,10 @@
 ---
 layout: post
-title: Unreal Engine networked pistol C++ implementation
+title: How to create a networked C++ actor in Unreal Engine 
 author: wout
-date: 2024-10-11 11:20:00 +0200
+date: 2024-11-14 00:00:00 Europe/Brussels
 category: [Tutorials]
-published: false
+published: true
 ---
 
 ## Setup
