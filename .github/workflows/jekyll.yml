@@ -1,6 +1,8 @@
 name: Build and deploy Jekyll site to GitHub Pages
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
@@ -11,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Use GitHub Actions' cache to cache dependencies on servers
+      # Use GitHub Actions' cache to cache dependencies
       - uses: actions/cache@v4
         with:
           path: vendor/bundle
@@ -19,10 +21,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gems-
 
-      # Use GitHub Deploy Action to build and deploy to Github
+      # Build and deploy using Jekyll Deploy Action
       - uses: jeffreytse/jekyll-deploy-action@v0.6.0
         with:
           provider: 'github'
-          token: ${{ secrets.GH_ACTIONS_TOKEN }} 
-          branch: 'main'
+          token: ${{ secrets.GH_ACTIONS_TOKEN }}
+          branch: 'gh-pages'  # Deploy to gh-pages branch
           cname: 'www.lbvrgames.com'
