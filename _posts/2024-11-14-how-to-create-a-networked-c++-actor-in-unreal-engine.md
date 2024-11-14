@@ -27,7 +27,7 @@ Once you have downloaded the template, rename the project from MultiplayerVR.upr
 To open the multiplayer virtual reality template in Visual Studio, right-click on the  VRTutorial.uproject file and select Generate Visual Studio project files. However, when you do this, you will notice the following pop-up window appear.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/ErrorPop-Up.png" alt="Error pop-up window" title="Error pop-up">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/ErrorPop-Up.png" alt="Error pop-up window" title="Error pop-up">
 </div>
 
 The pop-up window informs us that we cannot generate Visual Studio project files because the project doesn't contain any source code (i.e. C++ files). To resolve this, we can add C++ files through the Unreal Editor.
@@ -36,7 +36,7 @@ The pop-up window informs us that we cannot generate Visual Studio project files
 The first C++ file we will add is a header file containing the **CustomGrabType** enum. To do this, open the project in the Unreal Editor. Navigate to Tools > New C++ Class... > Common Classes > None, and click Next. In the following window, you will see a number of settings. Let's take a look at them.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/AddC++Class.png" alt="Add C++ class window" title="Add C++ class">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/AddC++Class.png" alt="Add C++ class window" title="Add C++ class">
 </div>
 
 First, we can choose a class type. Notice that initially, no class type is selected, and it is not required to select one. However, once you choose either Private or Public, you can toggle between these two options, but you cannot deselect both. This option determines the folder where the C++ files are placed. Before selecting an option, the path is */PathToProjectDirectory/Source/\<ModuleName\>/MyClass.(h)(cpp)*. After selecting Public, the header file will be placed in */PathToProjectDirectory/Source/\<ModuleName\>/Public/MyClass.h*, while the source file goes to */PathToProjectDirectory/Source/\<ModuleName\>/Private/MyClass.h*. If you select Private, both the header and source files are placed in */PathToProjectDirectory/Source/\<ModuleName\>/Private/*.
@@ -50,13 +50,13 @@ A more detailed explanation of the differences between these options can be foun
 The first class we will create is the **CustomGrabType** class, which we will set as Private. Therefore, name the class **CustomGrabType**. After the name field, you will see a dropdown menu that allows you to select the target module for your new class. Since we currently have only one module, you can leave this as it is. The other options can remain at their default values. Finally, click on Create Class. Once the class is created, you will see a message indicating that you need to build the project from your IDE (i.e. Visual Studio).
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/BuildFromIDEPop-UpMessage.png" alt="Build from IDE pop-up message window" title="Build from IDE pop-up message">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/BuildFromIDEPop-UpMessage.png" alt="Build from IDE pop-up message window" title="Build from IDE pop-up message">
 </div>
 
 Click OK. Next, a new message will appear, confirming that our class has been successfully added, but we must recompile our module before it will appear in the Content Browser.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/GenerateVisualStudioProjectFiles/RecompilePop-UpMessage.png" alt="Recompile pop-up message window" title="Recompile pop-up message">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/RecompilePop-UpMessage.png" alt="Recompile pop-up message window" title="Recompile pop-up message">
 </div>
 
 Click Yes. The Visual Studio project will open, displaying both the source and header files for **CustomGrabType**. To ensure everything compiles correctly at this point, right-click on the project in the Solution Explorer and select Build. If you did not close the Unreal Editor before building and the build configuration is set to Development Editor, you may encounter the following error.
@@ -495,19 +495,19 @@ When you examine the **CustomGrabComponent** code, you'll notice it closely rese
 To explain how I arrived at the current implementation and why we should use the approach from the previous tutorial instead, we need to establish a starting point. In the previous tutorial, we set the result of the **GetHeldByHand** function on the client side as follows.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/OnGrabbedAndOnDroppedFromPreviousTutorial.png" alt="Blueprint OnGrabbed and OnDropped events in the Pistol event graph from the previous tutorial" title="On grabbed and on dropped from previous tutorial">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/OnGrabbedAndOnDroppedFromPreviousTutorial.png" alt="Blueprint OnGrabbed and OnDropped events in the Pistol event graph from the previous tutorial" title="On grabbed and on dropped from previous tutorial">
 </div>
 
 By replicating the **MotionControllerRef** variable from the **CustomGrabComponent** class, we eliminate the need to pass the result of the **GetHeldByHand** function to the **GrabOnOwningClient** and **DropOnOwningClient** RPCs. This simplifies the logic on the **Pistol** event graph
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/PistolNetworkedOnGrabbedAndOnDropped.png" alt="A simplified version of the Blueprint OnGrabbed and OnDropped events in the Pistol event graph" title="Simplified on grabbed and on dropped">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/PistolNetworkedOnGrabbedAndOnDropped.png" alt="A simplified version of the Blueprint OnGrabbed and OnDropped events in the Pistol event graph" title="Simplified on grabbed and on dropped">
 </div>
 
 To replicate the **MotionControllerRef** variable from the **CustomGrabComponent** class, we need to add the `Replicated` specifier to the `UPROPERTY`. However, even though the property will be replicated, there is no guarantee that the replication will occur before the **GrabOnOwningClient** RPC is called, or before the **GetHeldByHand** function is executed in the **Pistol**’s event graph. This can happen even though the **MotionControllerRef** is set before the **OnGrabbed** event dispatcher is called in the **TryGrab** function.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/CustomGrabComponent/TryGrabFromPreviousTutorial.png" alt="Blueprint TryGrab function from the previous tutorial" title="Try grab from previous tutorial">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/TryGrabFromPreviousTutorial.png" alt="Blueprint TryGrab function from the previous tutorial" title="Try grab from previous tutorial">
 </div>
 
 If the **GetHeldByHand** function is called before the **MotionControllerRef** is set on the client side, it will result in the following warning and error:
@@ -998,7 +998,7 @@ Once you have done this, recompile your code.
 The **IMC_Default**, **IMC_Hands**, **IMC_Menu**, **IMC_Weapon_Left**, and **IMC_Weapon_Right** contexts are applied immediately when the Enhanced Input subsystem is ready. To prevent automatic addition of Input Mapping Contexts, you can disable 'Add Immediately' under Enhanced Input in the Project Settings, as we manage the mapping contexts manually.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/CustomPistol/InputMappingContextsAddImmediatelyDisabled.png" alt="Unreal Editor project settings where add immediately is disabled for the input mapping contexts" title="Input mapping contexts add immediately disabled">
+    <img src="/assets/images/2024-11-14/CustomPistol/InputMappingContextsAddImmediatelyDisabled.png" alt="Unreal Editor project settings where add immediately is disabled for the input mapping contexts" title="Input mapping contexts add immediately disabled">
 </div>
 
 Notice that in the `RemovePistolInputActions()` function, the binding handles are used to remove the pistol's input actions. While working on the C++ **Pistol**, I encountered a bug where the input actions were bound twice. As a result, the `ShootLeftBindingHandle` and `ShootRightBindingHandle` were overwritten in the `BindPistolInputActions()` function. This led to not all handles being properly removed when removing input actions. For example, if you grab the right weapon first, release it, then grab the left weapon, the handle for the right weapon remains. When you attempt to shoot, the lingering handle still calls the `ServerShootRight()` function. This function calls `GetHeldByHand()`, which uses `MotionControllerRef` to determine which hand holds the pistol. However, since `MotionControllerRef` is set to nullptr after dropping the right weapon, the program crashes. To prevent such errors, you can opt to clear all bindings for the pistol object. A code snippet for this solution is commented out in the `RemovePistolInputActions()` function.
@@ -1009,7 +1009,7 @@ Another issue I encountered was that if a **CustomPistol** was duplicated inside
 So far, we have created a C++ networked pistol. However, if you replace the Blueprint version with our **CustomPistol** and try to grab it, you will notice that nothing happens. Why is that? When attempting to grab an object, only those with a grab component of the class **GrabComponent** are considered. A better approach would be to create a base class for **GrabComponent** and derive both **CustomGrabComponent** and the Blueprint **GrabComponent** from it. However, for now, I will simply replace the Blueprint **GrabComponent** references with **CustomGrabComponent**. To do this, set the **ComponentClass** parameter of the **GetComponentsByClass** function in the **GetGrabComponentNearMotionController** function of the **VRPawn** class to **CustomGrabComponent**.
 
 <div align="center">
-    <img src="/assets/images/NetworkedPistolC++/UpdateTheBlueprintCode/ChangeComponentClass.png" alt="Blueprint code of the GetGrabComponentNearMotionController function of the VRPawn class where the ComponentClass argument of the GetComponentsByClass function is changed to CustomGrabComponent" title="Change component class">
+    <img src="/assets/images/2024-11-14/UpdateTheBlueprintCode/ChangeComponentClass.png" alt="Blueprint code of the GetGrabComponentNearMotionController function of the VRPawn class where the ComponentClass argument of the GetComponentsByClass function is changed to CustomGrabComponent" title="Change component class">
 </div>
 
 If we compile the Blueprint code, we will encounter errors indicating that **CustomGrabComponent** is not compatible with **GrabComponent**. To resolve these errors, address them one by one. This process includes updating all references to **GrabComponent** in the **GetGrabComponentNearMotionController** function and the event graph of the **VRPawn**.
