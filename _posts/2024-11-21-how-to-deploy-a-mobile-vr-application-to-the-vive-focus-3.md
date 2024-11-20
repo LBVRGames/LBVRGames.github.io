@@ -24,27 +24,27 @@ The Vive Focus 3 is an Android-based standalone headset, so the Unreal Engine wi
 
 * Open the Epic Games Launcher and go to Unreal Engine > Library.
 * Click on the arrow next to the Launch button, select Options > Target Platforms > Android and click Apply.
-* Install Android Studio and the necessary SDK components. Follow [Unreal Engine](https://dev.epicgames.com/documentation/en-us/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine?application_version=5.4)'s documentation for this. Under the section *Finalize and Verify Your SDK Setup* it is stated that you only need to close the Unreal Editor or command line. That didn't work for me. I had to reboot my computer.
+* Install Android Studio and the necessary SDK components. Follow [Unreal Engine](https://dev.epicgames.com/documentation/en-us/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine?application_version=5.4)'s documentation for this.
 
 ## Install the Vive Wave SDK
 
 The Vive Wave SDK provides the tools necessary to develop for the Vive Focus 3. The following steps explain how to install the SDK:
 
-* Download the Vive Wave SDK (latest version) from the [Vive Developer website](https://developer.vive.com/resources/vive-wave/download/latest/).
-* Extract the Vive Wave SDK and copy the Plugins directory's content (i.e. WaveVR) to your Unreal Engine project’s Plugins folder or the engine's plugin folder if you want to use it for all your projects.
+* Download the Vive Wave SDK (latest version) from the [Vive Developer website](https://developer.vive.com/resources/vive-wave/download/latest/). At the time this was UE 5.3. Despite UE 5.4 was already released.
+* Extract the Vive Wave SDK and copy the Plugins directory's content (i.e. WaveVR) to your Unreal Engine project’s Plugins folder.
 * Go to Edit > Plugins inside the Unreal Editor and search for Wave VR. If the plugin doesn't show up then restart the Unreal Editor and try again.
-* Enable the Wave VR plugin and restart the Unreal Engine as prompted.
+* Enable the Wave VR plugin and restart the Unreal Engine as prompted. If you get the **Missing Modules** message then change your Unreal Engine version from 5.4 to 5.3. If you installed the plugin in your Unreal Engine project's Plugins folder then make sure that you install it in UE 5.3.
 
 ## Configure the project settings
 
-Set the Project Settings according to [Vive](https://hub.vive.com/storage/docs/en-us/UnrealPlugin/UnrealPluginGettingStart.html#project-settings)'s documentation.
+Set the Project Settings according to [Vive](https://hub.vive.com/storage/docs/en-us/UnrealPlugin/UnrealPluginGettingStart.html#project-settings)'s documentation. The only difference with the Vive documentation is that on step 4 we first had to disable **Package for Meta Quest devics** and then enable **Support OpenGL ES3.2** otherwise this option cannot be changed. In the Vive documentation **Support OpenGL ES3.1** is mentioned but for us it was **Support OpenGL ES3.2**.
 
 ## Vive Wave SDK compliant
 
 To run the VRTemplate as an Android application on the Vive Focus 3 we need to make some changes to our Unreal project.
 
 **Enhanced Input**\\
-If you’re using Enhanced Input, ensure WaveVR inputs are mapped accordingly in your Input Mapping Contexts.
+If you’re using Enhanced Input, ensure WaveVR inputs are mapped accordingly in your Input Mapping Contexts. You can find them in your Content Browser > All > Content > VRTemplate > Input.
 * IMC_Default
     - IA_Move: **Wave (R) Thumbstick Y**
     - IA_Turn: **Wave (L) Thumbstick X**
@@ -76,10 +76,10 @@ If you’re using Enhanced Input, ensure WaveVR inputs are mapped accordingly in
 **VRPawn**
 * Change the Motion Source of the MotionControllerLeftGrip/MotionControllerRightGrip to **Left/Right**.
 * Rename the MotionControllerLeftAim/MotionControllerRightAim to **MotionControllerLeftAimOld/MotionControllerRightAimOld**.
-* Add a WaveVRControllerPointer as the child of the MotionControllerLeftGrip and name it **MotionControllerLeftAim/MotionControllerRightAim**.
+* Add a Wave VRController Pointer as the child of the MotionControllerLeftGrip/MotionControllerRightGrip and name it **MotionControllerLeftAim/MotionControllerRightAim**.
 * Set the **WidgetInteractionLeft/WidgetInteractionRight** as a child of the MotionControllerLeftAim/MotionControllerRightAim.
 * Go to the Event Graph, Input Action Move - Teleport and replace the Motion Controller Right Aim Old getter with the **Motion Controller Right Aim** getter. 
-* Remove the **MotionControllerLeftAimOld/MotionControllerRightAimOld**.
+* Delete the **MotionControllerLeftAimOld/MotionControllerRightAimOld**.
 
 At this point the Components hierarchy should look like the following:
 
@@ -92,30 +92,26 @@ At this point the Components hierarchy should look like the following:
 * Change the location and rotation of the HandLeft/HandRight
     - HandLeft
         + Location = **(X=-14.000000,Y=-3.500000,Z=-1.000000)**
-        + Rotation = **(Pitch=-90.000000,Yaw=-179.999999,Roll=89.999998)**
+        + Rotation = **(Pitch=-90.000000,Yaw=-180.000000,Roll=90.000000)**
     - HandRight
         + Location = **(X=-14.000000,Y=3.500000,Z=-1.000000)**
-        + Rotation = **(Pitch=90.000000,Yaw=0.000000,Roll=89.999999)**
+        + Rotation = **(Pitch=90.000000,Yaw=0.000000,Roll=90.000000)**
 
 **GrabComponent**
 * Go to the GetHeldByHand function and change LeftGrip to **Left**.
+* Go to the TryGrab function and replace PlayHapticEffect with **TriggerHapticPulse**.
+    <div align="center">
+        <img src="/assets/images/2024-11-21/GrabComponent/TriggerHapticPulseCalllInTryGrabFunction.png" alt="The TriggerHapticPulse function is called in the GrabComponent's TryGrab function." title="TriggerHapticPulse call in TryGrab function">
+    </div>
 
 **Pistol**
 * Change the location and rotation of the GrabComponentSnap.
-    - Location = **(X=0.000012,Y=12.000000,Z=5.000000)**
-    - Rotation = **(Pitch=10.000000,Yaw=90.000099,Roll=-0.000064)**
-
-**Haptic effects**
-* Replace PlayHapticEffect with **TriggerHapticPulse** in the GrabComponent's TryGrab function and in the Pistol's event graph.
-    - GrabComponent
-        <div align="center">
-            <img src="/assets/images/2024-11-21/GrabComponent/TriggerHapticPulseCalllInTryGrabFunction.png" alt="The TriggerHapticPulse function is called in the GrabComponent's TryGrab function." title="TriggerHapticPulse call in TryGrab function">
-        </div>
-
-    - Pistol
-        <div align="center">
-            <img src="/assets/images/2024-11-21/Pistol/TriggerHapticPulseCallInPistolEventGraph.png" alt="The TriggerHapticPulse function is called in the Pistol's event graph." title="TriggerHapticPulse call in Pistol event graph">
-        </div>
+    - Location = **(X=0.000000,Y=12.000000,Z=5.000000)**
+    - Rotation = **(Pitch=10.000000,Yaw=90.000000,Roll=0.000000)**
+* Go to the event graph and replace PlayHapticEffect with **TriggerHapticPulse**.
+    <div align="center">
+        <img src="/assets/images/2024-11-21/Pistol/TriggerHapticPulseCallInPistolEventGraph.png" alt="The TriggerHapticPulse function is called in the Pistol's event graph." title="TriggerHapticPulse call in Pistol event graph">
+    </div>
 
 **Menu**
 * In the SetMotionControllerReference function replace LeftAim/RightAim in the Select node with **Left/Right**.
