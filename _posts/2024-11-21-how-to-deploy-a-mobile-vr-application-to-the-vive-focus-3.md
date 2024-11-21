@@ -33,7 +33,23 @@ The Vive Wave SDK provides the tools necessary to develop for the Vive Focus 3. 
 * Download the Vive Wave SDK (latest version) from the [Vive Developer website](https://developer.vive.com/resources/vive-wave/download/latest/). At the time this was UE 5.3. Despite UE 5.4 was already released.
 * Extract the Vive Wave SDK and copy the Plugins directory's content (i.e. WaveVR) to your Unreal Engine project’s Plugins folder.
 * Go to Edit > Plugins inside the Unreal Editor and search for Wave VR. If the plugin doesn't show up then restart the Unreal Editor and try again.
-* Enable the Wave VR plugin and restart the Unreal Engine as prompted. If you get the **Missing Modules** message then change your Unreal Engine version from 5.4 to 5.3. If you installed the plugin in your Unreal Engine project's Plugins folder then make sure that you install it in UE 5.3.
+* Enable the Wave VR plugin and restart the Unreal Engine as prompted. If you get the following pop-up window then click **No**.
+
+    <div align="center">
+        <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/MissingModules.png" border="1" alt="The Missing Modules window." title="Missing Modules">
+    </div>
+
+    Right-click on the **.uproject** and select **Switch Unreal Engine version...**. change your Unreal Engine version from 5.4 to 5.3.
+
+    <div align="center">
+        <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/SwitchUnrealEngineVersion.png" alt="The Switch Unreal Engine version... option." title="Switch Unreal Engine Version">
+    </div>
+
+    Finally, change your Unreal Engine version from 5.4 to 5.3 from the drop-down menu.
+
+    <div align="center">
+        <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/SelectUnrealEngineVersion.png" border="1" alt="The Select Unreal Engine Version drop-down menu." title="Select Unreal Engine Version">
+    </div>
 
 ## Configure the project settings
 
@@ -101,7 +117,7 @@ At this point the Components hierarchy should look like the following:
 * Go to the GetHeldByHand function and change LeftGrip to **Left**.
 * Go to the TryGrab function and replace PlayHapticEffect with **TriggerHapticPulse**.
     <div align="center">
-        <img src="/assets/images/2024-11-21/GrabComponent/TriggerHapticPulseCalllInTryGrabFunction.png" alt="The TriggerHapticPulse function is called in the GrabComponent's TryGrab function." title="TriggerHapticPulse call in TryGrab function">
+        <img src="/assets/images/2024-11-21/GrabComponent/TriggerHapticPulseCallInTryGrabFunction.png" alt="The TriggerHapticPulse function is called in the GrabComponent's TryGrab function." title="TriggerHapticPulse call in TryGrab function">
     </div>
 
 **Pistol**
