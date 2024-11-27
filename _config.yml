@@ -5,6 +5,7 @@ description:         'Location-Based Virtual Reality enthusiasts building in pub
 url:                 'https://www.lbvrgames.com'
 baseurl:             ''
 permalink:           /:categories/:title
+future:              false
 
 # About/contact
 authors:
