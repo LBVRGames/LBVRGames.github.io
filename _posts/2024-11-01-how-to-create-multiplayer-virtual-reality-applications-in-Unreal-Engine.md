@@ -3,7 +3,7 @@ layout: post
 title: How to create multiplayer virtual reality applications in Unreal Engine
 author: wout
 date: 2024-11-01 00:00:00 Europe/Brussels
-category: [Tutorials]
+category: [How-to]
 published: true
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title: How to create a networked C++ actor in Unreal Engine 
 author: wout
 date: 2024-11-14 00:00:00 Europe/Brussels
-category: [Tutorials]
+category: [How-to]
 published: true
 ---
 

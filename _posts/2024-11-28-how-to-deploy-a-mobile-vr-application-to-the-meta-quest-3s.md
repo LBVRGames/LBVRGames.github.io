@@ -3,7 +3,7 @@ layout: post
 title: How to deploy a mobile VR application to the Meta Quest 3S
 author: wout
 date: 2024-11-28 00:00:00 Europe/Brussels
-category: [Tutorials]
+category: [How-to]
 published: true
 ---
 
