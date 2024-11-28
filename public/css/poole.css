@@ -217,6 +217,19 @@ pre code {
   opacity: 1;
 }
 
+.break-at-backslash {
+  white-space: normal;        /* Allow the text to wrap */
+  word-break: break-word;     /* Break long words if necessary */
+  overflow-wrap: anywhere;    /* Allow breaking anywhere */
+
+  /* Replace the backslash with itself and a zero-width space */
+  word-break: break-all;      /* For older browsers */
+}
+
+.break-at-backslash::after {
+  content: "\200B"; /* Zero-width space (Unicode character) after backslash */
+}
+
 /* Pygments via Jekyll */
 .highlight {
   margin-bottom: 1rem;
