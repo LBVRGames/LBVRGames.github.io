@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      How to create a networked C++ actor in Unreal Engine &middot; LBVR Games
+    
+  </title>
+
+  
+  <link rel="canonical" href="https://www.lbvrgames.com/how-to/how-to-create-a-networked-c++-actor-in-unreal-engine">
+  
+
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/poole.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/syntax.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <link rel="LBVRGamesIcon" sizes="144x144" href="https://www.lbvrgames.com/public/LBVRGamesIcon.png">
+  <link rel="shortcut icon" href="https://www.lbvrgames.com/public/favicon.ico">
+
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.lbvrgames.com/atom.xml">
+
+  
+
+  <script src="/assets/js/copy-button.js"></script>
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="https://www.lbvrgames.com/">Home</a>
+
+    
+
+    
+    
+      
+    
+      
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/about">About</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/documentation">Documentation</a>
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="https://github.com/LBVRGames">GitHub project</a>
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2024. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">LBVR Games</a>
+            <small>- Welcome to our community</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="post">
+  <h1 class="post-title">How to create a networked C++ actor in Unreal Engine</h1>
+  <span class="post-author">By <a href="https://woutswinkels.github.io/" target="_blank">Wout Swinkels</a></span> - 
+  <span class="post-date">14 Nov 2024</span>
+  <h2 id="setup">Setup</h2>
+<ul>
+  <li>CPU: Intel Core i5-13600KF</li>
+  <li>GPU: Inno3D GeForce RTX 4070 TWIN X2</li>
+  <li>RAM: 64 GB</li>
+  <li>OS:  Windows 10 Pro 22H2</li>
+  <li>UE:  5.4</li>
+  <li>IDE: Visual Studio 2022 Community Edition</li>
+</ul>
+
+<h2 id="summary">Summary</h2>
+<p>This tutorial explains how to implement a C++ version of the pistol from Unreal Engine’s Virtual Reality (VR) template in a multiplayer environment. Since this tutorial assumes familiarity with the VR template, I will not explain its internal workings beyond what is necessary to understand the changes being made. By the end of this tutorial, you will understand how to implement networked VR objects using C++. If you have any questions, feel free to <a href="mailto:tutorials@lbvrgames.com">email us</a>.</p>
+
+<h2 id="download-multiplayer-virtual-reality-template">Download multiplayer virtual reality template</h2>
+<p>The C++ pistol will be integrated into the multiplayer virtual reality template, which you can download from the <a href="https://www.unrealengine.com/marketplace/en-US/store">Unreal Engine Marketplace</a>. A tutorial explaining the multiplayer implementation of this template can be found here <a href="./unreal-engine-multiplayer-virtual-reality">here</a>.</p>
+
+<p>Once you have downloaded the template, rename the project from MultiplayerVR.uproject to VRTutorial.uproject.</p>
+
+<h2 id="generate-visual-studio-project-files">Generate Visual Studio project files</h2>
+<p>To open the multiplayer virtual reality template in Visual Studio, right-click on the  VRTutorial.uproject file and select Generate Visual Studio project files. However, when you do this, you will notice the following pop-up window appear.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/ErrorPop-Up.png" alt="Error pop-up window" title="Error pop-up" />
+</div>
+
+<p>The pop-up window informs us that we cannot generate Visual Studio project files because the project doesn’t contain any source code (i.e. C++ files). To resolve this, we can add C++ files through the Unreal Editor.</p>
+
+<h2 id="grabtype">GrabType</h2>
+<p>The first C++ file we will add is a header file containing the <strong>CustomGrabType</strong> enum. To do this, open the project in the Unreal Editor. Navigate to Tools &gt; New C++ Class… &gt; Common Classes &gt; None, and click Next. In the following window, you will see a number of settings. Let’s take a look at them.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/AddC++Class.png" alt="Add C++ class window" title="Add C++ class" />
+</div>
+
+<p>First, we can choose a class type. Notice that initially, no class type is selected, and it is not required to select one. However, once you choose either Private or Public, you can toggle between these two options, but you cannot deselect both. This option determines the folder where the C++ files are placed. Before selecting an option, the path is <em>/PathToProjectDirectory/Source/&lt;ModuleName&gt;/MyClass.(h)(cpp)</em>. After selecting Public, the header file will be placed in <em>/PathToProjectDirectory/Source/&lt;ModuleName&gt;/Public/MyClass.h</em>, while the source file goes to <em>/PathToProjectDirectory/Source/&lt;ModuleName&gt;/Private/MyClass.h</em>. If you select Private, both the header and source files are placed in <em>/PathToProjectDirectory/Source/&lt;ModuleName&gt;/Private/</em>.</p>
+
+<p>You might be wondering what the difference is between the Private and Public options. If you hover over each option, a small description appears:</p>
+<ul>
+  <li><strong>Public</strong>: A public class can be included and used inside other modules in addition to the module it resides in.</li>
+  <li><strong>Private</strong>: A private class can only be included and used within the module it resides in.</li>
+</ul>
+
+<p>A more detailed explanation of the differences between these options can be found on <a href="https://www.youtube.com/watch?v=T8D3AhNd9Ww&amp;ab_channel=UECasts">UE Casts</a>. Additionally, <a href="https://forums.unrealengine.com/t/what-public-and-private-mean-on-c-wizard/50336/5">SaxonRah</a> discusses the reasons for using public and private classes on the Unreal Engine forum.</p>
+
+<p>The first class we will create is the <strong>CustomGrabType</strong> class, which we will set as Private. Therefore, name the class <strong>CustomGrabType</strong>. After the name field, you will see a dropdown menu that allows you to select the target module for your new class. Since we currently have only one module, you can leave this as it is. The other options can remain at their default values. Finally, click on Create Class. Once the class is created, you will see a message indicating that you need to build the project from your IDE (i.e. Visual Studio).</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/BuildFromIDEPop-UpMessage.png" alt="Build from IDE pop-up message window" title="Build from IDE pop-up message" />
+</div>
+
+<p>Click OK. Next, a new message will appear, confirming that our class has been successfully added, but we must recompile our module before it will appear in the Content Browser.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/GenerateVisualStudioProjectFiles/RecompilePop-UpMessage.png" alt="Recompile pop-up message window" title="Recompile pop-up message" />
+</div>
+
+<p>Click Yes. The Visual Studio project will open, displaying both the source and header files for <strong>CustomGrabType</strong>. To ensure everything compiles correctly at this point, right-click on the project in the Solution Explorer and select Build. If you did not close the Unreal Editor before building and the build configuration is set to Development Editor, you may encounter the following error.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The command ""C:\W\Epic Games\UE_5.4\Engine\Build\BatchFiles\Build.bat" VRTutorialEditor Win64 Development -Project="E:\Unreal Projects\VRTutorial\VRTutorial.uproject" -WaitMutex -FromMsBuild -architecture=x64" exited with code 6.
+</code></pre></div></div>
+
+<p>Close the Unreal Editor and build the project again. Once the project is built, right-click on the project again, but this time select Debug &gt; Start New Instance. This will launch the Development Editor, provided that this is selected as the build configuration from the Solution Configurations list. After confirming that it works, you can close the Unreal Engine editor.</p>
+
+<p>The difference between Build and Start New Instance is that the former compiles the code without running it, while the latter compiles the code (if necessary) and then runs it. You can also click on Local Windows Debugger at the top. This performs the same function as Start New Instance. The only difference is that you can run only one instance with Local Windows Debugger, whereas Start New Instance allows multiple instances.</p>
+
+<p>Since <strong>CustomGrabType</strong> is just an enum, we can remove the source file and keep only the header file. Remove the source file from both the Solution Explorer and the source directory. The implementation of <strong>CustomGrabType</strong> should resemble the following:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="cp">#pragma once
+</span>
+<span class="cp">#include</span> <span class="cpf">"CustomGrabType.generated.h"</span><span class="cp">
+</span>
+<span class="n">UENUM</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span>
+<span class="k">enum</span> <span class="n">class</span> <span class="n">ECustomGrabType</span> <span class="o">:</span> <span class="n">uint8</span>
+<span class="p">{</span>
+    <span class="n">None</span> <span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span> <span class="o">=</span> <span class="s">"None"</span><span class="p">),</span>
+    <span class="n">Free</span> <span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span> <span class="o">=</span> <span class="s">"Free"</span><span class="p">),</span>
+    <span class="n">Snap</span> <span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span> <span class="o">=</span> <span class="s">"Snap"</span><span class="p">),</span>
+    <span class="n">Custom</span> <span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span> <span class="o">=</span> <span class="s">"Custom"</span><span class="p">)</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Build the project to include the <strong>CustomGrabType</strong>.</p>
+
+<h3 id="time-to-explain-a-few-things">Time to explain a few things</h3>
+<p>I will not explain every aspect of this class, but it’s worth noting that the Unreal Engine utilizes macros that are not part of the C++ language standard. Let’s break this down:</p>
+
+<p>The line <code class="language-plaintext highlighter-rouge">#include "CustomGrabType.generated.h"</code> includes another header file called <code class="language-plaintext highlighter-rouge">CustomGrabType.generated.h</code>, which is generated by the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-header-tool-for-unreal-engine">UnrealHeaderTool</a>. This command-line tool is used by the Unreal Engine to generate additional code and metadata for Unreal Engine types defined in header files.</p>
+
+<p>The line <code class="language-plaintext highlighter-rouge">UENUM(BlueprintType)</code> is a macro provided by the Unreal Engine. It defines an enumeration that can be utilized in Unreal Engine’s Blueprint visual scripting system.</p>
+
+<p>The line <code class="language-plaintext highlighter-rouge">enum class ECustomGrabType : uint8</code> begins the definition of the enumeration <code class="language-plaintext highlighter-rouge">ECustomGrabType</code>. This declaration specifies that <code class="language-plaintext highlighter-rouge">ECustomGrabType</code> is an enumeration with a fixed underlying type of <code class="language-plaintext highlighter-rouge">uint8</code>, allowing it to hold values ranging from 0 to 255. Note that the class name is prefixed with an “E” (i.e. <code class="language-plaintext highlighter-rouge">ECustomGrabType</code>) instead of simply being called <code class="language-plaintext highlighter-rouge">CustomGrabType</code>. This naming convention follows the Epic C++ <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/epic-cplusplus-coding-standard-for-unreal-engine">Coding Standard</a> for Unreal Engine.</p>
+
+<p>The subsequent lines define the individual enumeration values: <code class="language-plaintext highlighter-rouge">None</code>, <code class="language-plaintext highlighter-rouge">Free</code>, <code class="language-plaintext highlighter-rouge">Snap</code>, and <code class="language-plaintext highlighter-rouge">Custom</code>. Each value is assigned a display name using the <code class="language-plaintext highlighter-rouge">UMETA(DisplayName = "...")</code> macro. These display names enhance readability and can be accessed within Unreal Engine’s Blueprint system.</p>
+
+<h2 id="grabcomponent">GrabComponent</h2>
+<p>Next, we will implement the <strong>GrabComponent</strong> in C++. Begin by opening your project in the Unreal Editor. Navigate to Tools &gt; New C++ Class… &gt; Common Classes &gt; Scene Component and click Next. Set the class type to Private and name the class <strong>CustomGrabComponent</strong>. Then, click Create Class.</p>
+
+<p>Visual Studio will open, and you may need to reload your project files. After that, build your project. If you did not start the Unreal Editor from Visual Studio by selecting Start New Instance, but instead opened the project file from your file explorer or launched the editor from the Epic Games Launcher, you might encounter the following error:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The command ""C:\W\Epic Games\UE_5.4\Engine\Build\BatchFiles\Build.bat" VRTutorialEditor Win64 Development -Project="E:\Unreal Projects\VRTutorial\VRTutorial.uproject" -WaitMutex -FromMsBuild -architecture=x64" exited with code 6.
+</code></pre></div></div>
+
+<p>To resolve this error, close the Unreal Editor and build the project again.</p>
+
+<h3 id="customgrabcomponenth">CustomGrabComponent.h</h3>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="cp">#pragma once
+</span>
+<span class="c1">// Unreal Engine headers</span>
+<span class="cp">#include</span> <span class="cpf">"CoreMinimal.h"</span><span class="cp">
+#include</span> <span class="cpf">"Components/SceneComponent.h"</span><span class="cp">
+#include</span> <span class="cpf">"MotionControllerComponent.h"</span><span class="cp">
+#include</span> <span class="cpf">"Haptics/HapticFeedbackEffect_Base.h"</span><span class="cp">
+#include</span> <span class="cpf">"Kismet/GameplayStatics.h"</span><span class="cp">
+#include</span> <span class="cpf">"Net/UnrealNetwork.h"</span><span class="cp">
+</span>
+<span class="c1">// Project headers</span>
+<span class="cp">#include</span> <span class="cpf">"CustomGrabType.h"</span><span class="cp">
+</span>
+<span class="c1">// The .generated.h file must be the last include</span>
+<span class="cp">#include</span> <span class="cpf">"CustomGrabComponent.generated.h"</span><span class="cp">
+</span>
+<span class="n">DECLARE_DYNAMIC_MULTICAST_DELEGATE</span><span class="p">(</span><span class="n">FGrabEvent</span><span class="p">);</span>	<span class="c1">// https://www.reddit.com/r/unrealengine/comments/zygcku/ue51_is_unable_to_find_delegate_in_same_file/</span>
+
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">ClassGroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">Custom</span><span class="p">),</span> <span class="n">meta</span> <span class="o">=</span> <span class="p">(</span><span class="n">BlueprintSpawnableComponent</span><span class="p">))</span>
+<span class="n">class</span> <span class="n">UCustomGrabComponent</span> <span class="o">:</span> <span class="n">public</span> <span class="n">USceneComponent</span>
+<span class="p">{</span>
+	<span class="n">GENERATED_BODY</span><span class="p">()</span>
+
+<span class="nl">public:</span>
+	<span class="c1">// Sets default values for this component's properties</span>
+	<span class="n">UCustomGrabComponent</span><span class="p">();</span>
+
+	<span class="c1">// Called every frame</span>
+	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">TickComponent</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">,</span> <span class="n">ELevelTick</span> <span class="n">TickType</span><span class="p">,</span> <span class="n">FActorComponentTickFunction</span><span class="o">*</span> <span class="n">ThisTickFunction</span><span class="p">)</span> <span class="n">override</span><span class="p">;</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="n">bool</span> <span class="n">TryGrab</span><span class="p">(</span><span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">,</span> <span class="n">AActor</span><span class="o">*</span> <span class="n">Actor</span><span class="p">);</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="n">bool</span> <span class="n">TryRelease</span><span class="p">();</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">SetShouldSimulateOnDrop</span><span class="p">();</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">SetPrimitiveCompPhysics</span><span class="p">(</span><span class="n">bool</span> <span class="n">bSimulate</span><span class="p">);</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintPure</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Grab Component"</span><span class="p">)</span>
+	<span class="k">const</span> <span class="n">EControllerHand</span> <span class="n">GetHeldByHand</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">BlueprintAssignable</span><span class="p">)</span>
+	<span class="n">FGrabEvent</span> <span class="n">OnGrabbed</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">BlueprintAssignable</span><span class="p">)</span>
+	<span class="n">FGrabEvent</span> <span class="n">OnDropped</span><span class="p">;</span>
+
+<span class="nl">protected:</span>
+	<span class="c1">// Called when the game starts</span>
+	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">BeginPlay</span><span class="p">()</span> <span class="n">override</span><span class="p">;</span>
+
+<span class="nl">private:</span>
+	<span class="n">bool</span> <span class="n">AttachParentToMotionController</span><span class="p">(</span><span class="n">USceneComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">);</span>
+
+	<span class="c1">// Client function for setting the MotionControllerRef and owner on the client side</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientSetMotionControllerRefAndOwner</span><span class="p">(</span><span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">,</span> <span class="n">AActor</span><span class="o">*</span> <span class="n">Owner</span><span class="p">);</span>
+
+	<span class="c1">// Client function for removing the MotionControllerRef and owner on the client side</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientRemoveMotionControllerRefAndOwner</span><span class="p">();</span>
+
+	<span class="c1">// Server function for grabbing</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ServerGrab</span><span class="p">();</span>
+
+	<span class="c1">// Client function for playing the OnGrabHapticEffect on the client side</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Unreliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientPlayOnGrabHapticEffect</span><span class="p">();</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="n">ECustomGrabType</span> <span class="n">GrabType</span> <span class="o">=</span> <span class="n">ECustomGrabType</span><span class="o">::</span><span class="n">Free</span><span class="p">;</span>
+
+	<span class="c1">//The haptic effect played when this GrabComponent is grabbed</span>
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">)</span>
+	<span class="n">UHapticFeedbackEffect_Base</span><span class="o">*</span> <span class="n">OnGrabHapticEffect</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">,</span> <span class="n">Transient</span><span class="p">,</span> <span class="n">AdvancedDisplay</span><span class="p">)</span>
+	<span class="n">bool</span> <span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
+	<span class="c1">// Property to replicate with RepNotify</span>
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">,</span> <span class="n">AdvancedDisplay</span><span class="p">)</span>
+	<span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">,</span> <span class="n">AdvancedDisplay</span><span class="p">)</span>
+	<span class="n">UCustomGrabComponent</span><span class="o">*</span> <span class="n">PrimaryGrabComponent</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">,</span> <span class="n">Transient</span><span class="p">,</span> <span class="n">AdvancedDisplay</span><span class="p">)</span>
+	<span class="n">FRotator</span> <span class="n">PrimaryGrabRelativeRotation</span> <span class="o">=</span> <span class="n">FRotator</span><span class="o">::</span><span class="n">ZeroRotator</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditAnywhere</span><span class="p">,</span> <span class="n">Category</span> <span class="o">=</span> <span class="s">"Default"</span><span class="p">,</span> <span class="n">AdvancedDisplay</span><span class="p">)</span>
+	<span class="n">bool</span> <span class="n">bSimulateOnDrop</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="customgrabcomponentcpp">CustomGrabComponent.cpp</h3>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="cp">#include</span> <span class="cpf">"CustomGrabComponent.h"</span><span class="cp">
+</span>
+<span class="c1">// Sets default values for this component's properties</span>
+<span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">UCustomGrabComponent</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="c1">// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features</span>
+	<span class="c1">// off to improve performance if you don't need them.</span>
+	<span class="n">PrimaryComponentTick</span><span class="p">.</span><span class="n">bCanEverTick</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+
+	<span class="c1">// ...</span>
+	<span class="n">OnGrabHapticEffect</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UHapticFeedbackEffect_Base</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Haptics/GrabHapticEffect"</span><span class="p">));</span>
+
+	<span class="c1">// Replicate this component</span>
+	<span class="n">SetIsReplicatedByDefault</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Called every frame</span>
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">TickComponent</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">,</span> <span class="n">ELevelTick</span> <span class="n">TickType</span><span class="p">,</span> <span class="n">FActorComponentTickFunction</span><span class="o">*</span> <span class="n">ThisTickFunction</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">Super</span><span class="o">::</span><span class="n">TickComponent</span><span class="p">(</span><span class="n">DeltaTime</span><span class="p">,</span> <span class="n">TickType</span><span class="p">,</span> <span class="n">ThisTickFunction</span><span class="p">);</span>
+
+	<span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="n">bool</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">TryGrab</span><span class="p">(</span><span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">,</span> <span class="n">AActor</span><span class="o">*</span> <span class="n">Actor</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">switch</span> <span class="p">(</span><span class="n">GrabType</span><span class="p">)</span>
+	<span class="p">{</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">None</span><span class="o">:</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Free</span><span class="o">:</span>
+		<span class="n">SetPrimitiveCompPhysics</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+		<span class="n">AttachParentToMotionController</span><span class="p">(</span><span class="n">MotionController</span><span class="p">);</span>
+		<span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Snap</span><span class="o">:</span>
+	<span class="p">{</span>
+		<span class="n">SetPrimitiveCompPhysics</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+		<span class="n">AttachParentToMotionController</span><span class="p">(</span><span class="n">MotionController</span><span class="p">);</span>
+		<span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+		<span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetRelativeRotation</span><span class="p">(</span><span class="n">this</span><span class="o">-&gt;</span><span class="n">GetRelativeRotation</span><span class="p">().</span><span class="n">GetInverse</span><span class="p">(),</span> <span class="nb">false</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">,</span> <span class="n">ETeleportType</span><span class="o">::</span><span class="n">TeleportPhysics</span><span class="p">);</span>
+		<span class="n">FVector</span> <span class="n">NewLocation</span> <span class="o">=</span> <span class="p">(</span><span class="n">this</span><span class="o">-&gt;</span><span class="n">GetComponentLocation</span><span class="p">()</span> <span class="o">-</span> <span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetComponentLocation</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="mi">0</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="n">MotionController</span><span class="o">-&gt;</span><span class="n">GetComponentLocation</span><span class="p">();</span>
+		<span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetWorldLocation</span><span class="p">(</span><span class="n">NewLocation</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">,</span> <span class="n">ETeleportType</span><span class="o">::</span><span class="n">TeleportPhysics</span><span class="p">);</span>
+
+		<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Custom</span><span class="o">:</span>
+		<span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">bIsHeld</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">GetOwner</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetOwner</span><span class="p">(</span><span class="n">Actor</span><span class="p">);</span>
+		<span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">MotionController</span><span class="p">;</span>
+		<span class="n">ClientSetMotionControllerRefAndOwner</span><span class="p">(</span><span class="n">MotionController</span><span class="p">,</span> <span class="n">Actor</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="n">bIsHeld</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">bool</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">TryRelease</span><span class="p">()</span>
+<span class="p">{</span>
+
+	<span class="k">switch</span> <span class="p">(</span><span class="n">GrabType</span><span class="p">)</span>
+	<span class="p">{</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">None</span><span class="o">:</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Free</span><span class="o">:</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Snap</span><span class="o">:</span>
+	<span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">bSimulateOnDrop</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="n">SetPrimitiveCompPhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+		<span class="p">}</span>
+
+		<span class="n">FDetachmentTransformRules</span> <span class="n">DetachmentRules</span><span class="p">(</span>
+			<span class="n">EDetachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+			<span class="n">EDetachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+			<span class="n">EDetachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+			<span class="nb">true</span>
+		<span class="p">);</span>
+
+		<span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">DetachFromComponent</span><span class="p">(</span><span class="n">DetachmentRules</span><span class="p">);</span>
+		<span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">case</span> <span class="n">ECustomGrabType</span><span class="p">:</span><span class="o">:</span><span class="n">Custom</span><span class="o">:</span>
+		<span class="n">bIsHeld</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+		<span class="k">break</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bIsHeld</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">OnDropped</span><span class="p">.</span><span class="n">Broadcast</span><span class="p">();</span>
+		<span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+		<span class="n">ClientRemoveMotionControllerRefAndOwner</span><span class="p">();</span> <span class="c1">// I don't think this is necessary.</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="o">!</span><span class="n">bIsHeld</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">SetShouldSimulateOnDrop</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">UPrimitiveComponent</span><span class="o">*</span> <span class="n">PrimitiveComp</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UPrimitiveComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetAttachParent</span><span class="p">());</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">PrimitiveComp</span> <span class="o">&amp;&amp;</span> <span class="n">PrimitiveComp</span><span class="o">-&gt;</span><span class="n">IsAnySimulatingPhysics</span><span class="p">())</span>
+	<span class="p">{</span>
+		<span class="n">bSimulateOnDrop</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">SetPrimitiveCompPhysics</span><span class="p">(</span><span class="n">bool</span> <span class="n">bSimulate</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">UPrimitiveComponent</span><span class="o">*</span> <span class="n">PrimitiveComp</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UPrimitiveComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetAttachParent</span><span class="p">());</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">PrimitiveComp</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">PrimitiveComp</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="n">bSimulate</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+<span class="cp">#if UE_BUILD_DEVELOPMENT
+</span>		<span class="n">FString</span> <span class="n">ErrorMessage</span> <span class="o">=</span> <span class="s">"GrabComponent-&gt;SetSimulatingParent-&gt;Cast To PrimitiveComponent FAILED"</span><span class="p">;</span>
+		<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">AddOnScreenDebugMessage</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">.</span><span class="n">f</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Red</span><span class="p">,</span> <span class="n">ErrorMessage</span><span class="p">);</span>
+		<span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"%s"</span><span class="p">),</span> <span class="o">*</span><span class="n">ErrorMessage</span><span class="p">);</span>
+<span class="cp">#endif
+</span>	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">const</span> <span class="n">EControllerHand</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">MotionControllerRef</span><span class="o">-&gt;</span><span class="n">MotionSource</span> <span class="o">==</span> <span class="s">"LeftGrip"</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Left</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Called when the game starts</span>
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">Super</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">();</span>
+
+	<span class="n">SetShouldSimulateOnDrop</span><span class="p">();</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">UPrimitiveComponent</span><span class="o">*</span> <span class="n">PrimitiveComp</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UPrimitiveComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetAttachParent</span><span class="p">()))</span>
+	<span class="p">{</span>
+		<span class="n">PrimitiveComp</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">FName</span><span class="p">(</span><span class="s">"PhysicsActor"</span><span class="p">),</span> <span class="nb">true</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">bool</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">AttachParentToMotionController</span><span class="p">(</span><span class="n">USceneComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">FAttachmentTransformRules</span> <span class="n">AttachmentRules</span><span class="p">(</span>
+		<span class="n">EAttachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+		<span class="n">EAttachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+		<span class="n">EAttachmentRule</span><span class="o">::</span><span class="n">KeepWorld</span><span class="p">,</span>
+		<span class="nb">true</span>
+	<span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">MotionController</span><span class="p">,</span> <span class="n">AttachmentRules</span><span class="p">))</span>
+	<span class="p">{</span>
+<span class="cp">#if UE_BUILD_DEVELOPMENT
+</span>		<span class="n">FString</span> <span class="n">ErrorMessage</span> <span class="o">=</span> <span class="s">"Attaching"</span> <span class="o">+</span> <span class="n">GetAttachParent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">"to"</span> <span class="o">+</span> <span class="n">MotionController</span><span class="o">-&gt;</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">"FAILED - object not grabbed"</span><span class="p">;</span>
+		<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">AddOnScreenDebugMessage</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">.</span><span class="n">f</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Red</span><span class="p">,</span> <span class="n">ErrorMessage</span><span class="p">);</span>
+		<span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"%s"</span><span class="p">),</span> <span class="o">*</span><span class="n">ErrorMessage</span><span class="p">);</span>
+<span class="cp">#endif
+</span>
+		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">ClientSetMotionControllerRefAndOwner_Implementation</span><span class="p">(</span><span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">,</span> <span class="n">AActor</span><span class="o">*</span> <span class="n">Owner</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">GetOwnerRole</span><span class="p">()</span> <span class="o">!=</span> <span class="n">ROLE_Authority</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="cm">/*
+		   Set the VRPawn as the owner of this actor's owner. If we don't do this then the function ServerGrab() will not be executed on the server because the owner is not set.
+		   For the listen server client we don't have this problem because the owner is already set in the TryGrab() function and this function is executed on the server.
+		*/</span>
+		<span class="n">GetOwner</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetOwner</span><span class="p">(</span><span class="n">Owner</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">MotionController</span><span class="p">;</span>
+	<span class="n">ServerGrab</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">ClientRemoveMotionControllerRefAndOwner_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">GetOwnerRole</span><span class="p">()</span> <span class="o">!=</span> <span class="n">ROLE_Authority</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">// Set the owner to nullptr</span>
+		<span class="n">GetOwner</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetOwner</span><span class="p">(</span><span class="n">nullptr</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">ServerGrab_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">OnGrabbed</span><span class="p">.</span><span class="n">Broadcast</span><span class="p">();</span>
+	<span class="n">ClientPlayOnGrabHapticEffect</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">ClientPlayOnGrabHapticEffect_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">OnGrabHapticEffect</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">UGameplayStatics</span><span class="o">::</span><span class="n">GetPlayerController</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">PlayHapticEffect</span><span class="p">(</span><span class="n">OnGrabHapticEffect</span><span class="p">,</span> <span class="n">GetHeldByHand</span><span class="p">());</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When you compile your code, the following linker error appears:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unresolved external symbol "__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UMotionControllerComponent_NoRegister(void)" (__imp_?Z_Construct_UClass_UMotionControllerComponent_NoRegister@@YAPEAVUClass@@XZ) referenced in function "void __cdecl `dynamic initializer for 'public: static struct UECodeGen_Private::FObjectPropertyParams const Z_Construct_UFunction_UCustomGrabComponent_ClientSetMotionControllerRefAndOwner_Statics::NewProp_MotionController''(void)" (??__E?NewProp_MotionController@Z_Construct_UFunction_UCustomGrabComponent_ClientSetMotionControllerRefAndOwner_Statics@@2UFObjectPropertyParams@UECodeGen_Private@@B@@YAXXZ)	
+
+</code></pre></div></div>
+
+<p>This error indicates that the definition for <code class="language-plaintext highlighter-rouge">UMotionControllerComponent</code> could not be found. The class <code class="language-plaintext highlighter-rouge">UMotionControllerComponent</code> is defined in the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/HeadMountedDisplay"><code class="language-plaintext highlighter-rouge">HeadMountedDisplay</code></a> module. To resolve this, you need to add this module to the <code class="language-plaintext highlighter-rouge">PrivateDependencyModuleNames</code> array in the VRTutorial.Build.cs file.</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="k">using</span> <span class="nn">UnrealBuildTool</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">VRTutorial</span> <span class="p">:</span> <span class="n">ModuleRules</span>
+<span class="p">{</span>
+	<span class="k">public</span> <span class="nf">VRTutorial</span><span class="p">(</span><span class="n">ReadOnlyTargetRules</span> <span class="n">Target</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">Target</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">PCHUsage</span> <span class="p">=</span> <span class="n">PCHUsageMode</span><span class="p">.</span><span class="n">UseExplicitOrSharedPCHs</span><span class="p">;</span>
+
+		<span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="nf">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">"Core"</span><span class="p">,</span> <span class="s">"CoreUObject"</span><span class="p">,</span> <span class="s">"Engine"</span><span class="p">,</span> <span class="s">"InputCore"</span> <span class="p">});</span>
+
+		<span class="n">PrivateDependencyModuleNames</span><span class="p">.</span><span class="nf">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">"HeadMountedDisplay"</span> <span class="p">});</span>
+
+		<span class="c1">// Uncomment if you are using Slate UI</span>
+		<span class="c1">// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });</span>
+
+		<span class="c1">// Uncomment if you are using online features</span>
+		<span class="c1">// PrivateDependencyModuleNames.Add("OnlineSubsystem");</span>
+
+		<span class="c1">// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>After adding the module and recompiling your code, the linker error should be resolved. If the C++ Classes folder does not appear in the Content Browser, open the VRTutorial.uproject file in a text editor and add the following:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"Modules": [
+	{
+		"Name": "VRTutorial",
+		"Type": "Runtime",
+		"LoadingPhase": "Default",
+		"AdditionalDependencies": [
+			"Engine"
+		]
+	}
+],
+</code></pre></div></div>
+<p>If you didn’t name the project VRTutorial, replace it with your project’s name. A quick shoutout to <a href="https://forums.unrealengine.com/t/c-classes-not-showing-up-in-content-browser/86053/24">fkrstevski</a> for this solution.</p>
+
+<h3 id="time-to-explain-a-few-things-1">Time to explain a few things</h3>
+<p>When you examine the <strong>CustomGrabComponent</strong> code, you’ll notice it closely resembles the Blueprint <strong>GrabComponent</strong> from our <a href="./unreal-engine-multiplayer-virtual-reality">previous tutorial</a>. However, this time we set the entire <strong>MotionControllerRef</strong> on the client side, instead of just the result of the <strong>GetHeldByHand</strong> function.</p>
+
+<p>To explain how I arrived at the current implementation and why we should use the approach from the previous tutorial instead, we need to establish a starting point. In the previous tutorial, we set the result of the <strong>GetHeldByHand</strong> function on the client side as follows.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/OnGrabbedAndOnDroppedFromPreviousTutorial.png" alt="Blueprint OnGrabbed and OnDropped events in the Pistol event graph from the previous tutorial" title="On grabbed and on dropped from previous tutorial" />
+</div>
+
+<p>By replicating the <strong>MotionControllerRef</strong> variable from the <strong>CustomGrabComponent</strong> class, we eliminate the need to pass the result of the <strong>GetHeldByHand</strong> function to the <strong>GrabOnOwningClient</strong> and <strong>DropOnOwningClient</strong> RPCs. This simplifies the logic on the <strong>Pistol</strong> event graph</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/PistolNetworkedOnGrabbedAndOnDropped.png" alt="A simplified version of the Blueprint OnGrabbed and OnDropped events in the Pistol event graph" title="Simplified on grabbed and on dropped" />
+</div>
+
+<p>To replicate the <strong>MotionControllerRef</strong> variable from the <strong>CustomGrabComponent</strong> class, we need to add the <code class="language-plaintext highlighter-rouge">Replicated</code> specifier to the <code class="language-plaintext highlighter-rouge">UPROPERTY</code>. However, even though the property will be replicated, there is no guarantee that the replication will occur before the <strong>GrabOnOwningClient</strong> RPC is called, or before the <strong>GetHeldByHand</strong> function is executed in the <strong>Pistol</strong>’s event graph. This can happen even though the <strong>MotionControllerRef</strong> is set before the <strong>OnGrabbed</strong> event dispatcher is called in the <strong>TryGrab</strong> function.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/CustomGrabComponent/TryGrabFromPreviousTutorial.png" alt="Blueprint TryGrab function from the previous tutorial" title="Try grab from previous tutorial" />
+</div>
+
+<p>If the <strong>GetHeldByHand</strong> function is called before the <strong>MotionControllerRef</strong> is set on the client side, it will result in the following warning and error:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LogScript: Warning: Accessed None trying to read property MotionControllerRef
+    GrabComponent_C /Game/VRTemplate/Maps/UEDPIE_1_VRTemplateMap.VRTemplateMap:PersistentLevel.Pistol_00.GrabComponentSnap
+    Function /Game/VRTemplate/Blueprints/GrabComponent.GrabComponent_C:GetHeldByHand:0047
+PIE: Error: Blueprint Runtime Error: "Accessed None trying to read property MotionControllerRef". Node:  Return Node Graph:  GetHeldByHand Function:  Get Held by Hand Blueprint:  GrabComponent
+</code></pre></div></div>
+
+<h4 id="repnotify-to-the-rescue">RepNotify to the rescue!</h4>
+<p>To ensure that the <strong>MotionControllerRef</strong> is set before the <strong>OnGrabbed</strong> event dispatcher is called, we can use a <strong>RepNotify</strong>. This <strong>RepNotify</strong> function can then trigger a server RPC that calls the <strong>OnGrabbed</strong> event dispatcher. At this point, you might want to stop me, as you may have started to notice that we are going to perform two network calls for something we previously accomplished with just one. But you <a href="https://www.youtube.com/watch?v=RKmKEow9ues&amp;ab_channel=%21K7Records">can’t stop me now</a>. We are at the entrance of a very interesting rabbit hole.</p>
+
+<p>First, it’s important to note the <a href="https://vorixo.github.io/devtricks/stateful-events-multiplayer/#onreps">differences</a> between <strong>RepNotify</strong> in Blueprint and C++. In Blueprint, the <strong>RepNotify</strong> is executed on both the client and the server. In contrast, in C++, the <strong>RepNotify</strong> is only executed on the clients. Additionally, if the variable remains unchanged, the <strong>RepNotify</strong> is not called in both Blueprint and C++. In C++, we can change a variable by setting a pointer to nullptr. In Blueprint, a variable can be cleared by setting it without any input. Unfortunately, when I attempted this method in both C++ and Blueprint, the <strong>RepNotify</strong> was not called, even though the variable’s value had changed. However, in C++, you have the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/replicate-actor-properties-in-unreal-engine?application_version=5.4">option</a> to force the <strong>RepNotify</strong> to execute on every call, even when the variable doesn’t change. This can be achieved by setting the flag <code class="language-plaintext highlighter-rouge">REPNOTIFY_Always</code> in the <code class="language-plaintext highlighter-rouge">DOREPLIFETIME_CONDITION_NOTIFY()</code> function. This did the trick.</p>
+
+<p>Unfortunately, a <strong>RepNotify</strong> will not work in this scenario for two reasons. First, as mentioned earlier, the <strong>RepNotify</strong> is executed only on the clients and not on the server in C++. A potential solution might be to call the <strong>RepNotify</strong> function manually for the client acting as the listen server. However, it’s impossible to distinguish between a “normal” client and the listen server client, which means you would need to call the <strong>RepNotify</strong> for every client. You can see the call hierarchy in the following code snippet.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bool</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">TryGrab</span><span class="p">(</span><span class="n">UMotionControllerComponent</span><span class="o">*</span> <span class="n">MotionController</span><span class="p">,</span> <span class="n">AActor</span><span class="o">*</span> <span class="n">Actor</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="p">...</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">bIsHeld</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">GetOwner</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SetOwner</span><span class="p">(</span><span class="n">Actor</span><span class="p">);</span>
+		<span class="n">MotionControllerRef</span> <span class="o">=</span> <span class="n">MotionController</span><span class="p">;</span>
+		<span class="n">OnRep_MotionControllerRefUpdate</span><span class="p">();</span>
+	<span class="p">}</span>
+
+	<span class="p">...</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">OnRep_MotionControllerRefUpdate</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="c1">// Call OnGrabbed on server</span>
+	<span class="n">ServerGrab</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">ServerGrab_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">OnGrabbed</span><span class="p">.</span><span class="n">Broadcast</span><span class="p">();</span>
+	<span class="n">UGameplayStatics</span><span class="o">::</span><span class="n">GetPlayerController</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">PlayHapticEffect</span><span class="p">(</span><span class="n">OnGrabHapticEffect</span><span class="p">,</span> <span class="n">GetHeldByHand</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientGrab_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()))</span>
+    <span class="p">{</span>
+        <span class="c1">// Enable input for the player controller</span>
+        <span class="n">EnableInput</span><span class="p">(</span><span class="n">PlayerController</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">GetLocalPlayer</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">*</span> <span class="n">InputSubSystem</span> <span class="o">=</span> <span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetSubsystem</span><span class="o">&lt;</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="k">const</span> <span class="n">TCHAR</span><span class="o">*</span> <span class="n">Name</span> <span class="o">=</span> <span class="p">(</span><span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="o">==</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">)</span> <span class="o">?</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Right.IMC_Weapon_Right"</span><span class="p">)</span> <span class="o">:</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Left.IMC_Weapon_Left"</span><span class="p">);</span>
+
+                <span class="c1">// Hard reference load</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">UInputMappingContext</span><span class="o">*</span> <span class="n">InputMappingContext</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UInputMappingContext</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">Name</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="c1">// Add the InputMappingContext to the Subsystem</span>
+                    <span class="n">InputSubSystem</span><span class="o">-&gt;</span><span class="n">AddMappingContext</span><span class="p">(</span><span class="n">InputMappingContext</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+                    <span class="n">BindPistolInputActions</span><span class="p">();</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">const</span> <span class="n">EControllerHand</span> <span class="n">UCustomGrabComponent</span><span class="o">::</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">MotionControllerRef</span><span class="o">-&gt;</span><span class="n">MotionSource</span> <span class="o">==</span> <span class="s">"LeftGrip"</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Left</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">;</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Problem solved, right? Well, not exactly. The <strong>RepNotify</strong> function is called when the <strong>MotionControllerRef</strong> is set on the client. If we manually call the <strong>RepNotify</strong> function, it can be executed before the <strong>MotionControllerRef</strong> is set. This isn’t an issue for the listen server client, as the <strong>MotionControllerRef</strong> is already set on the server and, consequently, on the client since they are the same. However, it becomes more complicated for other clients. There’s a chance that the replicated variable is not yet set on those clients when it’s requested (as seen in the <code class="language-plaintext highlighter-rouge">GetHeldByHand()</code> function), which could lead to a crash due to a nullptr. While the listen server doesn’t face this problem, as the replicated variable is set on the server and directly accessible by the client, distinguishing between the listen server client and other clients to call the <strong>RepNotify</strong> function selectively is not feasible.</p>
+
+<p>Remember when I mentioned that there are two reasons why a <strong>RepNotify</strong> will not work? So far, we’ve only covered the first reason. Don’t worry! I’ll keep it brief for the second reason. The <strong>RepNotify</strong> function needs to call the server RPC responsible for calling the <strong>OnGrabbed</strong> event dispatcher. This server RPC will be executed for the client acting as the listen server, but it won’t run for other clients. The issue arises because the owner of the <strong>CustomGrabComponent</strong>’s owner is not set on these clients. Furthermore, since <strong>RepNotify</strong> functions cannot have parameters, we cannot pass an owner to be set on the client side.</p>
+
+<h4 id="rpcs-then">RPCs then?</h4>
+<p>The only viable option left is to use an RPC that runs on the owning client, sets the owner, and calls the server RPC upon a successful grab. Similarly, on a successful drop, an RPC runs on the owning client to remove the owner.</p>
+
+<p>By now, you can probably see why it would be much easier and better to simply send the result of the <strong>GetHeldByHand</strong> function as an argument with the <strong>GrabOnOwningClient</strong> and <strong>DropOnOwningClient</strong> RPCs.</p>
+
+<h2 id="pistol">Pistol</h2>
+<p>Next, we will implement the <strong>Pistol</strong> in C++. Begin by opening your project in the Unreal Editor. Navigate to Tools &gt; New C++ Class… &gt; Common Classes &gt; Actor, then click Next. Set the class type to Public and name the class <strong>CustomPistol</strong>. Click Create Class. Visual Studio will open, and you may need to reload all the project files. Once that’s done, build the project.</p>
+
+<h3 id="custompistolh">CustomPistol.h</h3>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="cp">#pragma once
+</span>
+<span class="c1">// Unreal Engine headers</span>
+<span class="cp">#include</span> <span class="cpf">"CoreMinimal.h"</span><span class="cp">
+#include</span> <span class="cpf">"GameFramework/Actor.h"</span><span class="cp">
+#include</span> <span class="cpf">"EnhancedInputSubsystems.h"</span><span class="cp">
+#include</span> <span class="cpf">"InputMappingContext.h"</span><span class="cp">
+#include</span> <span class="cpf">"EnhancedInputComponent.h"</span><span class="cp">
+#include</span> <span class="cpf">"Engine/StreamableManager.h"</span><span class="cp">
+#include</span> <span class="cpf">"Engine/AssetManager.h"</span><span class="cp">
+</span>
+<span class="c1">// Project headers</span>
+<span class="cp">#include</span> <span class="cpf">"CustomGrabComponent.h"</span><span class="cp">
+</span>
+<span class="c1">// The .generated.h file must be the last include</span>
+<span class="cp">#include</span> <span class="cpf">"CustomPistol.generated.h"</span><span class="cp">
+</span>
+<span class="n">UCLASS</span><span class="p">()</span>
+<span class="n">class</span> <span class="n">VRTUTORIAL_API</span> <span class="n">ACustomPistol</span> <span class="o">:</span> <span class="n">public</span> <span class="n">AActor</span>
+<span class="p">{</span>
+	<span class="n">GENERATED_BODY</span><span class="p">()</span>
+
+<span class="nl">public:</span>
+	<span class="c1">// Sets default values for this actor's properties</span>
+	<span class="n">ACustomPistol</span><span class="p">();</span>
+
+	<span class="c1">// Called every frame</span>
+	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">Tick</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">)</span> <span class="n">override</span><span class="p">;</span>
+
+<span class="nl">protected:</span>
+	<span class="c1">// Called when the game starts or when spawned</span>
+	<span class="k">virtual</span> <span class="kt">void</span> <span class="n">BeginPlay</span><span class="p">()</span> <span class="n">override</span><span class="p">;</span>
+
+<span class="nl">private:</span>
+	<span class="c1">// Client function for grabbing</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientGrab</span><span class="p">();</span>
+
+	<span class="kt">void</span> <span class="n">BindPistolInputActions</span><span class="p">();</span>
+
+	<span class="c1">// Client funtion for dropping</span>
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientDrop</span><span class="p">();</span>
+
+	<span class="kt">void</span> <span class="n">RemovePistolInputActions</span><span class="p">();</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">Unreliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ServerShootLeft</span><span class="p">();</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">Unreliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ServerShootRight</span><span class="p">();</span>
+
+	<span class="kt">void</span> <span class="n">Shoot</span><span class="p">();</span>
+
+	<span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Unreliable</span><span class="p">)</span>
+	<span class="kt">void</span> <span class="n">ClientPlayPistolFireHapticEffect</span><span class="p">();</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleInstanceOnly</span><span class="p">)</span>
+	<span class="n">USkeletalMeshComponent</span><span class="o">*</span> <span class="n">SkeletalMeshGun</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleInstanceOnly</span><span class="p">)</span>
+	<span class="n">UCustomGrabComponent</span><span class="o">*</span> <span class="n">GrabComponentSnap</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleInstanceOnly</span><span class="p">)</span>
+	<span class="n">USceneComponent</span><span class="o">*</span> <span class="n">MuzzleLocation</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="n">UHapticFeedbackEffect_Base</span><span class="o">*</span> <span class="n">PistolFireHapticEffect</span> <span class="o">=</span> <span class="n">nullptr</span><span class="p">;</span>
+
+	<span class="k">const</span> <span class="n">FInputBindingHandle</span><span class="o">*</span> <span class="n">ShootLeftBindingHandle</span><span class="p">;</span>
+
+	<span class="k">const</span> <span class="n">FInputBindingHandle</span><span class="o">*</span> <span class="n">ShootRightBindingHandle</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="custompistolcpp">CustomPistol.cpp</h3>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="cp">#include</span> <span class="cpf">"CustomPistol.h"</span><span class="cp">
+</span>
+<span class="c1">// Sets default values</span>
+<span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ACustomPistol</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.</span>
+    <span class="n">PrimaryActorTick</span><span class="p">.</span><span class="n">bCanEverTick</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+
+    <span class="c1">// Create and attach the SkeletalMeshGun to the actor</span>
+    <span class="n">SkeletalMeshGun</span> <span class="o">=</span> <span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">USkeletalMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"SkeletalMeshGun"</span><span class="p">));</span>
+    <span class="n">RootComponent</span> <span class="o">=</span> <span class="n">SkeletalMeshGun</span><span class="p">;</span>
+
+    <span class="c1">// Load the SkeletalMesh and Material</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">USkeletalMesh</span><span class="o">*</span> <span class="n">SkeletalMesh</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">USkeletalMesh</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/FPWeapon/Mesh/SK_FPGun"</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="c1">//SkeletalMeshGun-&gt;SetSkeletalMesh(SkeletalMesh);</span>
+		<span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetSkeletalMeshAsset</span><span class="p">(</span><span class="n">SkeletalMesh</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">UMaterialInterface</span><span class="o">*</span> <span class="n">SkeletalMeshMaterial</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UMaterialInterface</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/FPWeapon/Materials/M_FPGun_C++"</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetMaterial</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SkeletalMeshMaterial</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Scale the SkeletalMeshGun</span>
+    <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetWorldScale3D</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="n">f</span><span class="p">));</span>
+
+    <span class="c1">// Set the SkeletalMeshGun's physics settings</span>
+    <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+
+    <span class="c1">// Set the SkeletalMeshGun's collision settings</span>
+    <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetGenerateOverlapEvents</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+    <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">FName</span><span class="p">(</span><span class="s">"PhysicsActor"</span><span class="p">));</span>
+
+    <span class="c1">// Create and attach the GrabComponentSnap to the actor</span>
+    <span class="n">GrabComponentSnap</span> <span class="o">=</span> <span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UCustomGrabComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"GrabComponentSnap"</span><span class="p">));</span>
+    <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">SetupAttachment</span><span class="p">(</span><span class="n">SkeletalMeshGun</span><span class="p">);</span>
+
+    <span class="c1">// Set the GrabComponentSnap's location and rotation</span>
+    <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">SetWorldLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mo">000012</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">.</span><span class="mi">449529</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">700515</span><span class="p">));</span>
+    <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">SetWorldRotation</span><span class="p">(</span><span class="n">FRotator</span><span class="p">(</span><span class="mi">80</span><span class="p">.</span><span class="mo">0001</span><span class="mi">83</span><span class="p">,</span> <span class="mi">90</span><span class="p">.</span><span class="mo">0000</span><span class="mi">99</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">.</span><span class="mo">000064</span><span class="p">));</span>
+
+    <span class="c1">// Create and attach the MuzzleLocation to the actor</span>
+    <span class="n">MuzzleLocation</span> <span class="o">=</span> <span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">USceneComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">"MuzzleLocation"</span><span class="p">));</span>
+    <span class="n">MuzzleLocation</span><span class="o">-&gt;</span><span class="n">SetupAttachment</span><span class="p">(</span><span class="n">SkeletalMeshGun</span><span class="p">);</span>
+
+    <span class="c1">// Set the MuzzleLocation's location and rotation</span>
+    <span class="n">MuzzleLocation</span><span class="o">-&gt;</span><span class="n">SetWorldLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mo">000000</span><span class="p">,</span> <span class="mi">55</span><span class="p">.</span><span class="mo">000000</span><span class="p">,</span> <span class="mi">11</span><span class="p">.</span><span class="mo">000000</span><span class="p">));</span>
+    <span class="n">MuzzleLocation</span><span class="o">-&gt;</span><span class="n">SetWorldRotation</span><span class="p">(</span><span class="n">FRotator</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mo">000000</span><span class="p">,</span> <span class="mi">90</span><span class="p">.</span><span class="mo">000137</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mo">000000</span><span class="p">));</span>
+
+    <span class="c1">// Load the PistolFireHapticEffect</span>
+    <span class="n">PistolFireHapticEffect</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UHapticFeedbackEffect_Base</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Haptics/PistolFireHapticEffect"</span><span class="p">));</span>
+
+    <span class="c1">// Set the Replicates variable to true</span>
+    <span class="n">bReplicates</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+
+    <span class="c1">// Set the ReplicateMovement variable to true</span>
+    <span class="n">SetReplicateMovement</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+
+    <span class="c1">// Set the IsReplicated variable to true</span>
+    <span class="n">SkeletalMeshGun</span><span class="o">-&gt;</span><span class="n">SetIsReplicated</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Called every frame</span>
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Super</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="n">DeltaTime</span><span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="c1">// Called when the game starts or when spawned</span>
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Super</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">();</span>
+
+    <span class="c1">// Add ClientGrab to the OnGrabbed event dispatcher</span>
+    <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">OnGrabbed</span><span class="p">.</span><span class="n">AddDynamic</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientGrab</span><span class="p">);</span>
+    <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">OnDropped</span><span class="p">.</span><span class="n">AddDynamic</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientDrop</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientGrab_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()))</span>
+    <span class="p">{</span>
+        <span class="c1">// Enable input for the player controller</span>
+        <span class="n">EnableInput</span><span class="p">(</span><span class="n">PlayerController</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">GetLocalPlayer</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">*</span> <span class="n">InputSubSystem</span> <span class="o">=</span> <span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetSubsystem</span><span class="o">&lt;</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="cm">/*
+                    Get the InputMappingContext from the existing file
+
+                    "/Game/VRTemplate/Input/IMC_Weapon_Right.IMC_Weapon_Right"
+                    ----------------------------------------------------------
+                    This is the fully qualified reference to both the package and the specific object within that package. The part before the period refers to the package (the .uasset file).
+                    The part after the period (.) explicitly refers to the name of the object inside that package.
+                    It's useful when you want to be absolutely certain about loading a specific object, especially if the package contains multiple assets.
+
+                    "/Game/VRTemplate/Input/IMC_Weapon_Right"
+                    -----------------------------------------
+                    This path is simplified and refers to the package or asset, assuming that the asset's name inside the package matches the package's name (which is usually the case).
+                    It omits the explicit reference to the object within the package. Unreal assumes that you're referring to the object whose name matches the package name
+                    (in this case, IMC_Weapon_Right inside the IMC_Weapon_Right.uasset package).
+                */</span>
+                <span class="k">const</span> <span class="n">TCHAR</span><span class="o">*</span> <span class="n">Name</span> <span class="o">=</span> <span class="p">(</span><span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="o">==</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">)</span> <span class="o">?</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Right.IMC_Weapon_Right"</span><span class="p">)</span> <span class="o">:</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Left.IMC_Weapon_Left"</span><span class="p">);</span>
+
+                <span class="c1">// Hard reference load</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">UInputMappingContext</span><span class="o">*</span> <span class="n">InputMappingContext</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UInputMappingContext</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">Name</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="c1">// Add the InputMappingContext to the Subsystem</span>
+                    <span class="n">InputSubSystem</span><span class="o">-&gt;</span><span class="n">AddMappingContext</span><span class="p">(</span><span class="n">InputMappingContext</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+                    <span class="n">BindPistolInputActions</span><span class="p">();</span>
+                <span class="p">}</span>
+
+                <span class="cm">/*
+                // Set the soft object pointer path
+                TSoftObjectPtr&lt;UInputMappingContext&gt; InputMappingContext = TSoftObjectPtr&lt;UInputMappingContext&gt;(FSoftObjectPath(Name));
+
+                // Soft reference synchronous load
+                InputMappingContext.LoadSynchronous();
+
+                // Add the input mapping context to the input system
+                if (InputMappingContext.IsValid())
+                {
+                    InputSubSystem-&gt;AddMappingContext(InputMappingContext.Get(), 1);
+                }
+                */</span>
+
+                <span class="cm">/*
+                // Set the soft object pointer path
+                TSoftObjectPtr&lt;UInputMappingContext&gt; InputMappingContext = TSoftObjectPtr&lt;UInputMappingContext&gt;(FSoftObjectPath(Name));
+
+                // Soft reference asynchronous load
+                TSharedPtr&lt;FStreamableHandle&gt; Handle = UAssetManager::GetStreamableManager().RequestAsyncLoad(InputMappingContext.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([=]()
+                {
+                    if (InputMappingContext.IsValid())
+                    {
+                        InputSubSystem-&gt;AddMappingContext(InputMappingContext.Get(), 1);
+                        UE_LOG(LogTemp, Log, TEXT("Asset Loaded: %s"), *InputMappingContext.Get()-&gt;GetName());
+                    }
+                }));
+                */</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"ClientGrab_Implementation"</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">BindPistolInputActions</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()))</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">UEnhancedInputComponent</span><span class="o">*</span> <span class="n">EnhancedInput</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UEnhancedInputComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">InputComponent</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">UInputAction</span><span class="o">*</span> <span class="n">IA_Shoot_Left</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UInputAction</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/Actions/IA_Shoot_Left.IA_Shoot_Left"</span><span class="p">)))</span>
+            <span class="p">{</span>
+                <span class="n">ShootLeftBindingHandle</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">EnhancedInput</span><span class="o">-&gt;</span><span class="n">BindAction</span><span class="p">(</span><span class="n">IA_Shoot_Left</span><span class="p">,</span> <span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Started</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ServerShootLeft</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">UInputAction</span><span class="o">*</span> <span class="n">IA_Shoot_Right</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UInputAction</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/Actions/IA_Shoot_Right.IA_Shoot_Right"</span><span class="p">)))</span>
+            <span class="p">{</span>
+                <span class="n">ShootRightBindingHandle</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">EnhancedInput</span><span class="o">-&gt;</span><span class="n">BindAction</span><span class="p">(</span><span class="n">IA_Shoot_Right</span><span class="p">,</span> <span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Started</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ServerShootRight</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientDrop_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()))</span>
+    <span class="p">{</span>
+        <span class="c1">// Disable input for the player controller</span>
+        <span class="n">DisableInput</span><span class="p">(</span><span class="n">PlayerController</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">ULocalPlayer</span><span class="o">*</span> <span class="n">LocalPlayer</span> <span class="o">=</span> <span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">GetLocalPlayer</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">*</span> <span class="n">InputSubSystem</span> <span class="o">=</span> <span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetSubsystem</span><span class="o">&lt;</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+            <span class="p">{</span>
+                <span class="c1">// Get the InputMappingContext from the existing file</span>
+                <span class="k">const</span> <span class="n">TCHAR</span><span class="o">*</span> <span class="n">Name</span> <span class="o">=</span> <span class="p">(</span><span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="o">==</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">)</span> <span class="o">?</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Right.IMC_Weapon_Right"</span><span class="p">)</span> <span class="o">:</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Input/IMC_Weapon_Left.IMC_Weapon_Left"</span><span class="p">);</span>
+
+                <span class="c1">// Hard reference load</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">UInputMappingContext</span><span class="o">*</span> <span class="n">InputMappingContext</span> <span class="o">=</span> <span class="n">LoadObject</span><span class="o">&lt;</span><span class="n">UInputMappingContext</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">Name</span><span class="p">))</span>
+                <span class="p">{</span>
+                    <span class="c1">// Remove the InputMappingContext from the Subsystem</span>
+                    <span class="n">InputSubSystem</span><span class="o">-&gt;</span><span class="n">RemoveMappingContext</span><span class="p">(</span><span class="n">InputMappingContext</span><span class="p">);</span>
+
+                    <span class="n">RemovePistolInputActions</span><span class="p">();</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">RemovePistolInputActions</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PlayerController</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()))</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">UEnhancedInputComponent</span><span class="o">*</span> <span class="n">EnhancedInput</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UEnhancedInputComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PlayerController</span><span class="o">-&gt;</span><span class="n">InputComponent</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ShootLeftBindingHandle</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">EnhancedInput</span><span class="o">-&gt;</span><span class="n">RemoveBinding</span><span class="p">(</span><span class="o">*</span><span class="n">ShootLeftBindingHandle</span><span class="p">))</span>
+                    <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Log</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"ShootLeftBindingHandle removed"</span><span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">ShootRightBindingHandle</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">EnhancedInput</span><span class="o">-&gt;</span><span class="n">RemoveBinding</span><span class="p">(</span><span class="o">*</span><span class="n">ShootRightBindingHandle</span><span class="p">))</span>
+                    <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Log</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"ShootRightBindingHandle removed"</span><span class="p">));</span>
+            <span class="p">}</span>
+
+            <span class="c1">//EnhancedInput-&gt;ClearBindingsForObject(this);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ServerShootLeft_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="o">==</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Left</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Shoot</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ServerShootRight_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">()</span> <span class="o">==</span> <span class="n">EControllerHand</span><span class="o">::</span><span class="n">Right</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Shoot</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">Shoot</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Set the MuzzleLocation's location and rotation</span>
+    <span class="n">FTransform</span> <span class="n">ProjectileTransform</span> <span class="o">=</span> <span class="n">FTransform</span><span class="p">(</span><span class="n">MuzzleLocation</span><span class="o">-&gt;</span><span class="n">GetComponentRotation</span><span class="p">(),</span> <span class="n">MuzzleLocation</span><span class="o">-&gt;</span><span class="n">GetComponentLocation</span><span class="p">(),</span> <span class="n">FVector</span><span class="p">(</span><span class="mi">1</span><span class="p">.</span><span class="mo">000000</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mo">000000</span><span class="p">,</span> <span class="mi">1</span><span class="p">.</span><span class="mo">000000</span><span class="p">));</span>
+
+    <span class="c1">// Spawn parameters for the projectile</span>
+    <span class="n">FActorSpawnParameters</span> <span class="n">SpawnParams</span><span class="p">;</span>
+    <span class="n">SpawnParams</span><span class="p">.</span><span class="n">Owner</span> <span class="o">=</span> <span class="n">this</span><span class="p">;</span>
+    <span class="n">SpawnParams</span><span class="p">.</span><span class="n">Instigator</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetPawn</span><span class="p">();</span>
+
+    <span class="cm">/*
+        In Unreal Engine, every Blueprint has a unique path, and to access it in C++, you need the correct path including the _C suffix.
+        If you try to load a Blueprint without the _C suffix, you are loading the Blueprint asset, not the class.
+    */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">UClass</span><span class="o">*</span> <span class="n">ProjectileClass</span> <span class="o">=</span> <span class="n">LoadClass</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"/Game/VRTemplate/Blueprints/Projectile.Projectile_C"</span><span class="p">)))</span>
+    <span class="p">{</span>
+        <span class="c1">// Spawn the projectile</span>
+        <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SpawnActor</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ProjectileClass</span><span class="p">,</span> <span class="n">ProjectileTransform</span><span class="p">,</span> <span class="n">SpawnParams</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Play the haptic effect on the owning client</span>
+    <span class="n">ClientPlayPistolFireHapticEffect</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">ACustomPistol</span><span class="o">::</span><span class="n">ClientPlayPistolFireHapticEffect_Implementation</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PistolFireHapticEffect</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">UGameplayStatics</span><span class="o">::</span><span class="n">GetPlayerController</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">PlayHapticEffect</span><span class="p">(</span><span class="n">PistolFireHapticEffect</span><span class="p">,</span> <span class="n">GrabComponentSnap</span><span class="o">-&gt;</span><span class="n">GetHeldByHand</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you try to build your project at this point, you will get the following error:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Cannot open include file: 'EnhancedInputSubsystems.h': No such file or directory
+</code></pre></div></div>
+
+<p>To resolve this, you need to add <code class="language-plaintext highlighter-rouge">"EnhancedInput"</code> to <code class="language-plaintext highlighter-rouge">PublicDependencyModuleNames</code> in the VRTutorial.Build.cs file.</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Fill out your copyright notice in the Description page of Project Settings.</span>
+
+<span class="k">using</span> <span class="nn">UnrealBuildTool</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">VRTutorial</span> <span class="p">:</span> <span class="n">ModuleRules</span>
+<span class="p">{</span>
+	<span class="k">public</span> <span class="nf">VRTutorial</span><span class="p">(</span><span class="n">ReadOnlyTargetRules</span> <span class="n">Target</span><span class="p">)</span> <span class="p">:</span> <span class="k">base</span><span class="p">(</span><span class="n">Target</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">PCHUsage</span> <span class="p">=</span> <span class="n">PCHUsageMode</span><span class="p">.</span><span class="n">UseExplicitOrSharedPCHs</span><span class="p">;</span>
+
+		<span class="n">PublicDependencyModuleNames</span><span class="p">.</span><span class="nf">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">"EnhancedInput"</span><span class="p">,</span> <span class="s">"Core"</span><span class="p">,</span> <span class="s">"CoreUObject"</span><span class="p">,</span> <span class="s">"Engine"</span><span class="p">,</span> <span class="s">"InputCore"</span> <span class="p">});</span>
+
+		<span class="n">PrivateDependencyModuleNames</span><span class="p">.</span><span class="nf">AddRange</span><span class="p">(</span><span class="k">new</span> <span class="kt">string</span><span class="p">[]</span> <span class="p">{</span> <span class="s">"HeadMountedDisplay"</span> <span class="p">});</span>
+
+		<span class="c1">// Uncomment if you are using Slate UI</span>
+		<span class="c1">// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });</span>
+
+		<span class="c1">// Uncomment if you are using online features</span>
+		<span class="c1">// PrivateDependencyModuleNames.Add("OnlineSubsystem");</span>
+
+		<span class="c1">// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Once you have done this, recompile your code.</p>
+
+<h3 id="time-to-explain-a-few-things-2">Time to explain a few things</h3>
+<p>The <strong>IMC_Default</strong>, <strong>IMC_Hands</strong>, <strong>IMC_Menu</strong>, <strong>IMC_Weapon_Left</strong>, and <strong>IMC_Weapon_Right</strong> contexts are applied immediately when the Enhanced Input subsystem is ready. To prevent automatic addition of Input Mapping Contexts, you can disable ‘Add Immediately’ under Enhanced Input in the Project Settings, as we manage the mapping contexts manually.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/CustomPistol/InputMappingContextsAddImmediatelyDisabled.png" alt="Unreal Editor project settings where add immediately is disabled for the input mapping contexts" title="Input mapping contexts add immediately disabled" />
+</div>
+
+<p>Notice that in the <code class="language-plaintext highlighter-rouge">RemovePistolInputActions()</code> function, the binding handles are used to remove the pistol’s input actions. While working on the C++ <strong>Pistol</strong>, I encountered a bug where the input actions were bound twice. As a result, the <code class="language-plaintext highlighter-rouge">ShootLeftBindingHandle</code> and <code class="language-plaintext highlighter-rouge">ShootRightBindingHandle</code> were overwritten in the <code class="language-plaintext highlighter-rouge">BindPistolInputActions()</code> function. This led to not all handles being properly removed when removing input actions. For example, if you grab the right weapon first, release it, then grab the left weapon, the handle for the right weapon remains. When you attempt to shoot, the lingering handle still calls the <code class="language-plaintext highlighter-rouge">ServerShootRight()</code> function. This function calls <code class="language-plaintext highlighter-rouge">GetHeldByHand()</code>, which uses <code class="language-plaintext highlighter-rouge">MotionControllerRef</code> to determine which hand holds the pistol. However, since <code class="language-plaintext highlighter-rouge">MotionControllerRef</code> is set to nullptr after dropping the right weapon, the program crashes. To prevent such errors, you can opt to clear all bindings for the pistol object. A code snippet for this solution is commented out in the <code class="language-plaintext highlighter-rouge">RemovePistolInputActions()</code> function.</p>
+
+<p>Another issue I encountered was that if a <strong>CustomPistol</strong> was duplicated inside the Unreal Editor, you couldn’t shoot with the duplicated pistol (i.e. no projectiles were spawned). This problem was related to the <strong>OnGrabbed</strong> delegate. Moving the <code class="language-plaintext highlighter-rouge">AddDynamic()</code> function call from the constructor to the <code class="language-plaintext highlighter-rouge">BeginPlay()</code> function appeared to resolve the issue. I came across the solution <a href="https://forums.unrealengine.com/t/adddynamic-not-working/299247/6">here</a>.</p>
+
+<h3 id="update-the-blueprint-code">Update the Blueprint code</h3>
+<p>So far, we have created a C++ networked pistol. However, if you replace the Blueprint version with our <strong>CustomPistol</strong> and try to grab it, you will notice that nothing happens. Why is that? When attempting to grab an object, only those with a grab component of the class <strong>GrabComponent</strong> are considered. A better approach would be to create a base class for <strong>GrabComponent</strong> and derive both <strong>CustomGrabComponent</strong> and the Blueprint <strong>GrabComponent</strong> from it. However, for now, I will simply replace the Blueprint <strong>GrabComponent</strong> references with <strong>CustomGrabComponent</strong>. To do this, set the <strong>ComponentClass</strong> parameter of the <strong>GetComponentsByClass</strong> function in the <strong>GetGrabComponentNearMotionController</strong> function of the <strong>VRPawn</strong> class to <strong>CustomGrabComponent</strong>.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-14/UpdateTheBlueprintCode/ChangeComponentClass.png" alt="Blueprint code of the GetGrabComponentNearMotionController function of the VRPawn class where the ComponentClass argument of the GetComponentsByClass function is changed to CustomGrabComponent" title="Change component class" />
+</div>
+
+<p>If we compile the Blueprint code, we will encounter errors indicating that <strong>CustomGrabComponent</strong> is not compatible with <strong>GrabComponent</strong>. To resolve these errors, address them one by one. This process includes updating all references to <strong>GrabComponent</strong> in the <strong>GetGrabComponentNearMotionController</strong> function and the event graph of the <strong>VRPawn</strong>.</p>
+
+<p>Once you’ve resolved all the errors and run the project, you will notice that the pistols don’t snap to your hand as they used to. This occurs because the <strong>GrabType</strong> is set to <strong>Free</strong> by default, and since the original <strong>GrabComponent</strong> Blueprint didn’t include a <strong>SetGrabType</strong> function, I did not implement it in C++. Therefore, you will need to set the <strong>GrabType</strong> in the Unreal Editor. To do this, click on the pistol in your level, search for <strong>GrabType</strong> in the Details panel, and set it to <strong>Snap</strong>.</p>
+
+<p>Another thing you may have noticed is that the collision profile name for the <code class="language-plaintext highlighter-rouge">SkeletalMeshGun</code> is set to <code class="language-plaintext highlighter-rouge">PhysicsActor</code> in the <strong>CustomPistol</strong> constructor. However, this is repeated in the <code class="language-plaintext highlighter-rouge">BeginPlay()</code> function of <strong>CustomGrabComponent</strong>, as the <code class="language-plaintext highlighter-rouge">SkeletalMeshGun</code> is the parent of <strong>CustomGrabComponent</strong>. This led me to believe I could remove the <code class="language-plaintext highlighter-rouge">SetCollisionProfileName</code> call from the <strong>CustomPistol</strong> constructor. However, when I did so, the function call to <code class="language-plaintext highlighter-rouge">IsAnySimulatingPhysics()</code> in the <code class="language-plaintext highlighter-rouge">SetShouldSimulateOnDrop()</code> function returned false, even though <code class="language-plaintext highlighter-rouge">SetSimulatePhysics(true)</code> is called for the <code class="language-plaintext highlighter-rouge">SkeletalMeshGun</code> in the <strong>CustomPistol</strong> constructor.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bool</span> <span class="n">USkeletalMeshComponent</span><span class="o">::</span><span class="n">IsAnySimulatingPhysics</span><span class="p">()</span> <span class="k">const</span>
+<span class="p">{</span>
+	<span class="k">for</span> <span class="p">(</span> <span class="n">int32</span> <span class="n">BodyIndex</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">BodyIndex</span><span class="o">&lt;</span><span class="n">Bodies</span><span class="p">.</span><span class="n">Num</span><span class="p">();</span> <span class="o">++</span><span class="n">BodyIndex</span> <span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">Bodies</span><span class="p">[</span><span class="n">BodyIndex</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">IsInstanceSimulatingPhysics</span><span class="p">())</span>
+		<span class="p">{</span>
+			<span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The reason for this behavior is that the <code class="language-plaintext highlighter-rouge">Bodies</code> array is empty. However, when we set the collision profile name to <code class="language-plaintext highlighter-rouge">PhysicsActor</code> for the <code class="language-plaintext highlighter-rouge">SkeletalMeshGun</code> in the <strong>CustomPistol</strong> constructor, the <code class="language-plaintext highlighter-rouge">Bodies</code> array is populated. At this point, I am not entirely sure why this occurs. If you have insights on this, please reach out.</p>
+
+<h2 id="grabbable_smallcube">Grabbable_SmallCube</h2>
+<p>Since we are now only looking for the <strong>CustomGrabComponent</strong> to grab objects, the <strong>Grabbable_SmallCube</strong> instances are no longer grabbable. To resolve this, we can either replace the <strong>GrabComponent</strong> of the <strong>Grabbable_SmallCube</strong> with <strong>CustomGrabComponent</strong> or duplicate the <strong>Grabbable_SmallCube</strong> and update the component in the duplicated version. The cubes in the <strong>VRTemplateMap</strong> can then be replaced with the duplicated version. We will opt for the latter option. To do this, follow these steps:</p>
+
+<ol>
+  <li>Duplicate the <strong>Grabbable_SmallCube</strong> Blueprint and rename it to <strong>Custom_Grabbable_SmallCube</strong>.</li>
+  <li>Add the <strong>CustomGrab</strong> as a component and rename it to <strong>CustomGrabComponent</strong>.</li>
+  <li>Set the scale of the <strong>CustomGrabComponent</strong> to match that of the original <strong>GrabComponent</strong>.</li>
+  <li>Delete the <strong>GrabComponent</strong>.</li>
+  <li>Compile the <strong>Custom_Grabbable_SmallCube</strong> Blueprint class.</li>
+  <li>In the Outliner on the right-hand side of the <strong>VRTemplateMap</strong>, select all instances of the <strong>Grabbable_SmallCube</strong>. Right-click on the selected items and choose Replace Selected Actors with &gt; <strong>Custom_Grabbable_SmallCube</strong>. If the <a href="https://forums.unrealengine.com/t/replace-selected-actor-does-not-apply-scale-values/1902492">scale values</a> are not applied correctly, you may need to replace the actors manually or adjust the scale manually. The latter option is likely to require less work.</li>
+</ol>
+
+<p>The <strong>Cube_FireLogs</strong> and <strong>SM_Ball_01</strong> also have a grab component but do not have a Blueprint class. If you want to make these objects grabbable, select them in the Outliner of the <strong>VRTemplateMap</strong> and replace the <strong>GrabComponent</strong> with a <strong>CustomGrabComponent</strong> in their respective details panels.</p>
+
+</div>
+
+
+<div class="related">
+  <h2>Related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/explanation/oculus-openxr-runtime-conflicts-with-vive-openxr-runtime-on-windows-10">
+            Oculus OpenXR runtime conflicts with Vive OpenXR runtime on Windows 10
+            <small>04 Dec 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-meta-quest-3s">
+            How to deploy a mobile VR application to the Meta Quest 3S
+            <small>28 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-vive-focus-3">
+            How to deploy a mobile VR application to the Vive Focus 3
+            <small>21 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script src='/public/js/script.js'></script>
+  </body>
+</html>
