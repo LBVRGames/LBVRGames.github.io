@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      How to deploy a mobile VR application to the Vive Focus 3 &middot; LBVR Games
+    
+  </title>
+
+  
+  <link rel="canonical" href="https://www.lbvrgames.com/how-to/how-to-deploy-a-mobile-vr-application-to-the-vive-focus-3">
+  
+
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/poole.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/syntax.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <link rel="LBVRGamesIcon" sizes="144x144" href="https://www.lbvrgames.com/public/LBVRGamesIcon.png">
+  <link rel="shortcut icon" href="https://www.lbvrgames.com/public/favicon.ico">
+
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.lbvrgames.com/atom.xml">
+
+  
+
+  <script src="/assets/js/copy-button.js"></script>
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="https://www.lbvrgames.com/">Home</a>
+
+    
+
+    
+    
+      
+    
+      
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/about">About</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/documentation">Documentation</a>
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="https://github.com/LBVRGames">GitHub project</a>
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2024. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">LBVR Games</a>
+            <small>- Welcome to our community</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="post">
+  <h1 class="post-title">How to deploy a mobile VR application to the Vive Focus 3</h1>
+  <span class="post-author">By <a href="https://woutswinkels.github.io/" target="_blank">Wout Swinkels</a></span> - 
+  <span class="post-date">21 Nov 2024</span>
+  <h2 id="setup">Setup</h2>
+<ul>
+  <li>CPU: Intel Core i5-13600KF</li>
+  <li>GPU: Inno3D GeForce RTX 4070 TWIN X2</li>
+  <li>RAM: 64 GB</li>
+  <li>OS:  Windows 10 Pro 22H2</li>
+  <li>UE:  5.4</li>
+  <li>HMD: Vive Focus 3</li>
+</ul>
+
+<h2 id="summary">Summary</h2>
+<p>This tutorial explains how to deploy a mobile VR application to the Vive Focus 3. We will use the VRTemplate as the application to be deployed. By the end of the tutorial, you will be able to run the VRTemplate as a mobile application on the Vive Focus 3. If you have any questions, feel free to <a href="mailto:tutorials@lbvrgames.com">email us</a>.</p>
+
+<h2 id="set-up-android-sdk-and-ndk">Set Up Android SDK and NDK</h2>
+
+<p>The Vive Focus 3 is an Android-based standalone headset, so the Unreal Engine will need to be configured for Android development. I started with UE 5.4 but when trying to install the Vive Wave SDK I discovered that there was no support for UE 5.4. The latest supported version is UE 5.3. Despite using UE 5.4 for the Android SDK and NDK setup I had no issues switching to UE 5.3 when installing the Vive Wave SDK. The advantage of using UE 5.4 or newer is that the Android Turnkey installation can be used which simplifies the installation process. To set up the Android SDK and NDK in UE 5.4 follow the next steps:</p>
+
+<ul>
+  <li>Open the Epic Games Launcher and go to Unreal Engine &gt; Library.</li>
+  <li>Click on the arrow next to the Launch button, select Options &gt; Target Platforms &gt; Android and click Apply.</li>
+  <li>Install Android Studio and the necessary SDK components. Follow <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine?application_version=5.4">Unreal Engine</a>’s documentation for this.</li>
+</ul>
+
+<h2 id="install-the-vive-wave-sdk">Install the Vive Wave SDK</h2>
+
+<p>The Vive Wave SDK provides the tools necessary to develop for the Vive Focus 3. The following steps explain how to install the SDK:</p>
+
+<ul>
+  <li>Download the Vive Wave SDK (latest version) from the <a href="https://developer.vive.com/resources/vive-wave/download/latest/">Vive Developer website</a>. At the time this was UE 5.3. Despite UE 5.4 was already released.</li>
+  <li>Extract the Vive Wave SDK and copy the Plugins directory’s content (i.e. WaveVR) to your Unreal Engine project’s Plugins folder.</li>
+  <li>Go to Edit &gt; Plugins inside the Unreal Editor and search for Wave VR. If the plugin doesn’t show up then restart the Unreal Editor and try again.</li>
+  <li>
+    <p>Enable the Wave VR plugin and restart the Unreal Engine as prompted. If you get the following pop-up window then click <strong>No</strong>.</p>
+
+    <div align="center">
+      <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/MissingModules.png" border="1" alt="The Missing Modules window." title="Missing Modules" />
+  </div>
+
+    <p>Right-click on the <strong>.uproject</strong> and select <strong>Switch Unreal Engine version…</strong>. change your Unreal Engine version from 5.4 to 5.3.</p>
+
+    <div align="center">
+      <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/SwitchUnrealEngineVersion.png" alt="The Switch Unreal Engine version... option." title="Switch Unreal Engine Version" />
+  </div>
+
+    <p>Finally, change your Unreal Engine version from 5.4 to 5.3 from the drop-down menu.</p>
+
+    <div align="center">
+      <img src="/assets/images/2024-11-21/InstallTheViveWaveSDK/SelectUnrealEngineVersion.png" border="1" alt="The Select Unreal Engine Version drop-down menu." title="Select Unreal Engine Version" />
+  </div>
+  </li>
+</ul>
+
+<h2 id="configure-the-project-settings">Configure the project settings</h2>
+
+<p>Set the Project Settings according to <a href="https://hub.vive.com/storage/docs/en-us/UnrealPlugin/UnrealPluginGettingStart.html#project-settings">Vive</a>’s documentation. The only difference with the Vive documentation is that on step 4 we first had to disable <strong>Package for Meta Quest devics</strong> and then enable <strong>Support OpenGL ES3.2</strong> otherwise this option cannot be changed. In the Vive documentation <strong>Support OpenGL ES3.1</strong> is mentioned but for us it was <strong>Support OpenGL ES3.2</strong>.</p>
+
+<h2 id="vive-wave-sdk-compliant">Vive Wave SDK compliant</h2>
+
+<p>To run the VRTemplate as an Android application on the Vive Focus 3 we need to make some changes to our Unreal project.</p>
+
+<p><strong>Enhanced Input</strong><br />
+If you’re using Enhanced Input, ensure WaveVR inputs are mapped accordingly in your Input Mapping Contexts. You can find them in your Content Browser &gt; All &gt; Content &gt; VRTemplate &gt; Input.</p>
+<ul>
+  <li>IMC_Default
+    <ul>
+      <li>IA_Move: <strong>Wave (R) Thumbstick Y</strong></li>
+      <li>IA_Turn: <strong>Wave (L) Thumbstick X</strong></li>
+      <li>IA_Grab_Left: <strong>Wave (L) Grip Press</strong></li>
+      <li>IA_Grab_Right: <strong>Wave (R) Grip Press</strong></li>
+      <li>IA_Menu_Toggle_Left: <strong>Wave (L) Y Press</strong></li>
+      <li>IA_Menu_Toggle_Right: <strong>Wave (R) B Press</strong></li>
+    </ul>
+  </li>
+  <li>IMC_Hands
+    <ul>
+      <li>IA_Hand_Point_Left: <strong>Wave (L) Trigger Touch</strong></li>
+      <li>IA_Hand_Point_Right: <strong>Wave (R) Trigger Touch</strong></li>
+      <li>IA_Hand_ThumbUp_Left: <strong>Wave (L) Thumbstick Touch</strong></li>
+      <li>IA_Hand_ThumbUp_Right: <strong>Wave (R) Thumbstick Touch</strong></li>
+      <li>IA_Hand_Grasp_Left: <strong>Wave (L) Grip Axis</strong></li>
+      <li>IA_Hand_Grasp_Right: <strong>Wave (R) Grip Axis</strong></li>
+      <li>IA_Hand_IndexCurl_Left: <strong>Wave (L) Trigger Axis</strong></li>
+      <li>IA_Hand_IndexCurl_Right: <strong>Wave (R) Trigger Axis</strong></li>
+    </ul>
+  </li>
+  <li>IMC_Menu
+    <ul>
+      <li>IA_Menu_Interact_Left: <strong>Wave (L) Trigger Axis</strong></li>
+      <li>IA_Menu_Interact_Right: <strong>Wave (R) Trigger Axis</strong></li>
+    </ul>
+  </li>
+  <li>IMC_Weapon_Left
+    <ul>
+      <li>IA_Shoot_Left: <strong>Wave (L) Trigger Press</strong></li>
+    </ul>
+  </li>
+  <li>IMC_Weapon_Right
+    <ul>
+      <li>IA_Shoot_Right: <strong>Wave (R) Trigger Press</strong></li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>VRPawn</strong></p>
+<ul>
+  <li>Change the Motion Source of the MotionControllerLeftGrip/MotionControllerRightGrip to <strong>Left/Right</strong>.</li>
+  <li>Rename the MotionControllerLeftAim/MotionControllerRightAim to <strong>MotionControllerLeftAimOld/MotionControllerRightAimOld</strong>.</li>
+  <li>Add a Wave VRController Pointer as the child of the MotionControllerLeftGrip/MotionControllerRightGrip and name it <strong>MotionControllerLeftAim/MotionControllerRightAim</strong>.</li>
+  <li>Set the <strong>WidgetInteractionLeft/WidgetInteractionRight</strong> as a child of the MotionControllerLeftAim/MotionControllerRightAim.</li>
+  <li>Go to the Event Graph, Input Action Move - Teleport and replace the Motion Controller Right Aim Old getter with the <strong>Motion Controller Right Aim</strong> getter.</li>
+  <li>Delete the <strong>MotionControllerLeftAimOld/MotionControllerRightAimOld</strong>.</li>
+</ul>
+
+<p>At this point the Components hierarchy should look like the following:</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-21/VRPawn/ComponentsHierarchy.png" alt="The Components panel." title="Components hierarchy" />
+</div>
+
+<ul>
+  <li>Set the Spot scale of the MotionControllerLeftAim/MotionControllerRightAim to  <strong>(X=0.000000,Y=0.000000,Z=0.000000)</strong> to hide the pointer.</li>
+  <li>Set the Fading particle size of the MotionControllerLeftAim/MotionControllerRightAim to  <strong>(X=0.000000,Y=0.000000,Z=0.000000)</strong> to hide the beam.</li>
+  <li>Change the location and rotation of the HandLeft/HandRight
+    <ul>
+      <li>HandLeft
+        <ul>
+          <li>Location = <strong>(X=-14.000000,Y=-3.500000,Z=-1.000000)</strong></li>
+          <li>Rotation = <strong>(Pitch=-90.000000,Yaw=-180.000000,Roll=90.000000)</strong></li>
+        </ul>
+      </li>
+      <li>HandRight
+        <ul>
+          <li>Location = <strong>(X=-14.000000,Y=3.500000,Z=-1.000000)</strong></li>
+          <li>Rotation = <strong>(Pitch=90.000000,Yaw=0.000000,Roll=90.000000)</strong></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>GrabComponent</strong></p>
+<ul>
+  <li>Go to the GetHeldByHand function and change LeftGrip to <strong>Left</strong>.</li>
+  <li>Go to the TryGrab function and replace PlayHapticEffect with <strong>TriggerHapticPulse</strong>.
+    <div align="center">
+      <img src="/assets/images/2024-11-21/GrabComponent/TriggerHapticPulseCallInTryGrabFunction.png" alt="The TriggerHapticPulse function is called in the GrabComponent's TryGrab function." title="TriggerHapticPulse call in TryGrab function" />
+  </div>
+  </li>
+</ul>
+
+<p><strong>Pistol</strong></p>
+<ul>
+  <li>Change the location and rotation of the GrabComponentSnap.
+    <ul>
+      <li>Location = <strong>(X=0.000000,Y=12.000000,Z=5.000000)</strong></li>
+      <li>Rotation = <strong>(Pitch=10.000000,Yaw=90.000000,Roll=0.000000)</strong></li>
+    </ul>
+  </li>
+  <li>Go to the event graph and replace PlayHapticEffect with <strong>TriggerHapticPulse</strong>.
+    <div align="center">
+      <img src="/assets/images/2024-11-21/Pistol/TriggerHapticPulseCallInPistolEventGraph.png" alt="The TriggerHapticPulse function is called in the Pistol's event graph." title="TriggerHapticPulse call in Pistol event graph" />
+  </div>
+  </li>
+</ul>
+
+<p><strong>Menu</strong></p>
+<ul>
+  <li>In the SetMotionControllerReference function replace LeftAim/RightAim in the Select node with <strong>Left/Right</strong>.</li>
+</ul>
+
+<h2 id="testing-and-deployment">Testing and Deployment</h2>
+
+<p><strong>Package the Project</strong></p>
+<ul>
+  <li>In the Unreal Editor, go to <strong>Platforms &gt; Android &gt; Package Project</strong> and under <strong>Flavor selection</strong> choose <strong>Android (ASTC)</strong>.</li>
+</ul>
+
+<p><strong>Deploy to the Vive Focus 3</strong></p>
+<ul>
+  <li>Set the headset in <strong><a href="https://developer.vive.com/resources/hardware-guides/vive-focus-specs-user-guide/how-do-i-put-focus-developer-mode/">Developer Mode</a></strong>.</li>
+  <li>In <strong>Developer Mode</strong> on the headset, enable <strong>USB Debugging</strong> in <strong>Settings &gt; Advanced &gt; USB debugging</strong>.</li>
+  <li>Connect your <strong>Vive Focus 3</strong> to your PC using a USB-C cable.</li>
+  <li>Use the <strong>Android Debug Bridge (ADB)</strong>, found in Android SDK’s platform-tools folder, to install the APK:</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb <span class="nb">install </span>path/to/yourproject.apk
+</code></pre></div></div>
+
+<ul>
+  <li>Launch the app from the headset’s app library once installed.</li>
+</ul>
+
+<h2 id="time-to-explain-a-few-things">Time to explain a few things</h2>
+
+<p>You will notice that in the orignal VRTemplate it was possible to use the thumbstick to move over the Menu. This is not possible with the Wave SDK because there is no WaveVR input that combines both the X- and Y-value. If you look at the IMC_Menu you will see under IA_Menu_Cursor_Left [Vendor] (L) Thumbstick 2D-Axis. This option is not available for the WaveVR input.</p>
+
+<p>In the VRPawn we have changed the Motion Source from LeftGrip/RightGrip to Left/Right. However, if you hover over Motion Source you will see the following description: <em>Defines which pose this component should receive from the OpenXR Runtime. Left/Right MotionSource is the same as LeftGrip/RightGrip. See OpenXR specification for details on poses</em>. It is important to emphasize that this is the case for <strong>OpenXR</strong> since we no longer use this plugin there is no option available called LeftGrip/RightGrip. You will see this if you click on the drop-down list. If we don’t change the Motion Source then both hands will lay on the ground and don’t move at all.</p>
+
+<p>We have also made the WaveVRControllerPointer, called MotionControllerLeftAim/MotionControllerRightAim, a child of the MotionControllerLeftGrip/MotionControllerRightGrip. This is done to make sure that the WaveVRControllerPointer is tracked since it has no Motion Source. In the original VRTemplate this is not necessary because there the MotionControllerLeftAim/MotionControllerRightAim uses the LeftAim/RightAim Motion Source. Since, these are part of OpenXR we can no longer use them.</p>
+
+</div>
+
+
+<div class="related">
+  <h2>Related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/explanation/oculus-openxr-runtime-conflicts-with-vive-openxr-runtime-on-windows-10">
+            Oculus OpenXR runtime conflicts with Vive OpenXR runtime on Windows 10
+            <small>04 Dec 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-meta-quest-3s">
+            How to deploy a mobile VR application to the Meta Quest 3S
+            <small>28 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-create-a-networked-c++-actor-in-unreal-engine">
+            How to create a networked C++ actor in Unreal Engine
+            <small>14 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script src='/public/js/script.js'></script>
+  </body>
+</html>

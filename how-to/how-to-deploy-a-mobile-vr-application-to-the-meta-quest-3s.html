@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      How to deploy a mobile VR application to the Meta Quest 3S &middot; LBVR Games
+    
+  </title>
+
+  
+  <link rel="canonical" href="https://www.lbvrgames.com/how-to/how-to-deploy-a-mobile-vr-application-to-the-meta-quest-3s">
+  
+
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/poole.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/syntax.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <link rel="LBVRGamesIcon" sizes="144x144" href="https://www.lbvrgames.com/public/LBVRGamesIcon.png">
+  <link rel="shortcut icon" href="https://www.lbvrgames.com/public/favicon.ico">
+
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.lbvrgames.com/atom.xml">
+
+  
+
+  <script src="/assets/js/copy-button.js"></script>
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="https://www.lbvrgames.com/">Home</a>
+
+    
+
+    
+    
+      
+    
+      
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/about">About</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/documentation">Documentation</a>
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="https://github.com/LBVRGames">GitHub project</a>
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2024. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">LBVR Games</a>
+            <small>- Welcome to our community</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="post">
+  <h1 class="post-title">How to deploy a mobile VR application to the Meta Quest 3S</h1>
+  <span class="post-author">By <a href="https://woutswinkels.github.io/" target="_blank">Wout Swinkels</a></span> - 
+  <span class="post-date">28 Nov 2024</span>
+  <h2 id="setup">Setup</h2>
+<ul>
+  <li>CPU: Intel Core i5-13600KF</li>
+  <li>GPU: Inno3D GeForce RTX 4070 TWIN X2</li>
+  <li>RAM: 64 GB</li>
+  <li>OS:  Windows 10 Pro 22H2</li>
+  <li>UE:  5.4</li>
+  <li>HMD: Meta Quest 3S</li>
+</ul>
+
+<h2 id="summary">Summary</h2>
+<p>This tutorial explains how to deploy a mobile VR application to the Meta Quest 3S. We will use the VRTemplate as the application to be deployed. By the end of the tutorial, you will be able to run the VRTemplate as a mobile application on the Meta Quest 3S. If you have any questions, feel free to <a href="mailto:tutorials@lbvrgames.com">email us</a>.</p>
+
+<h2 id="set-up-android-sdk-and-ndk">Set Up Android SDK and NDK</h2>
+<p>The Meta Quest 3S is an Android-based standalone headset, so the Unreal Engine will need to be configured for Android development. To set up the Android SDK and NDK in UE 5.4 follow the next steps:</p>
+
+<ul>
+  <li>Open the Epic Games Launcher and go to Unreal Engine &gt; Library.</li>
+  <li>Click on the arrow next to the Launch button, select Options &gt; Target Platforms &gt; Android and click Apply.</li>
+  <li>Install Android Studio and the necessary SDK components. Follow <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine?application_version=5.4">Unreal Engine</a>’s documentation for this.</li>
+</ul>
+
+<h2 id="install-the-meta-xr-plugin">Install the Meta XR Plugin</h2>
+<p>Follow the steps under the <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-quick-start-install-metaxr-plugin/#the-meta-xr-plugin-and-ue-5x">The Meta XR plugin and UE 5.x</a> section.</p>
+
+<h2 id="configure-the-headset-for-app-development">Configure the headset for app development</h2>
+<p>Follow the steps on the <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-quick-start-config-headset">Configuring your headset for app development</a> webpage.</p>
+
+<h2 id="configure-the-unreal-project">Configure the Unreal project</h2>
+<ul>
+  <li>Follow the steps on the <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-setting-up-metaxr-plugin">Setting up the Meta XR plugin for your project</a> webpage.
+    <ul>
+      <li>The final section is called <strong>Configure the Meta XR Platform window</strong>. This part can be skipped since it is dealing with <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-plugin-settings#general-meta-xr-settings">uploading your Unreal Engine apps for Quest devices to the Meta Horizon platform</a>. We will upload our apps directly to the headset. Therefore, this is not needed.</li>
+      <li>An overview of the Meta XR plugin settings can be found <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-plugin-settings">here</a>. For now everything can be left at their default setting.</li>
+    </ul>
+  </li>
+  <li>Go to Project Settings &gt; Platforms &gt; Android and enable <a href="https://dev.epicgames.com/community/learning/tutorials/y4vB/unreal-engine-5-4-x-for-meta-quest-vr">Package game data inside .apk?</a>.</li>
+</ul>
+
+<h2 id="launch-the-app-on-a-meta-quest-headset">Launch the app on a Meta Quest headset</h2>
+<ul>
+  <li>Package your app by going to Platforms &gt; Android &gt; Package Project where the Flavor Selection is set to Android (ASTC).</li>
+  <li>Once the package is ready you plug in the headset to your PC.</li>
+  <li>Open a command prompt in the package directory and type <code class="language-plaintext highlighter-rouge">adb devices</code>.
+    <ul>
+      <li><strong>If</strong> <code class="language-plaintext highlighter-rouge">adb devices</code> doesn’t show the headset then install the <a href="https://developers.meta.com/horizon/downloads/package/oculus-adb-drivers/">Oculus ADB Drivers</a> and try it again.</li>
+      <li>If the device is <code class="language-plaintext highlighter-rouge">unauthorized</code> then put on the headset go to settings &gt; system &gt; developers &gt; allow checkbox “MTP Notifications”. Reboot headset. Connect USB Cable. Allow USB debug. <a href="https://www.reddit.com/r/sidequest/comments/jbt4ug/comment/lt4x6c4/?utm_source=share&amp;utm_medium=web3x&amp;utm_name=web3xcss&amp;utm_term=1&amp;utm_content=share_button">Source</a></li>
+    </ul>
+  </li>
+  <li>Install the application by running the command <code class="language-plaintext highlighter-rouge">adb install &lt;apk-path&gt;</code> or <code class="language-plaintext highlighter-rouge">adb install -r &lt;apk-path&gt;</code> if an application with the same name already exists on the device.</li>
+</ul>
+
+<p>The following approaches didn’t work for me:</p>
+<ul>
+  <li><a href="https://developers.meta.com/horizon/documentation/unreal/unreal-packaging-and-preparing-your-new-project#launching-your-app-on-a-meta-quest-headset">Launching your app on a Meta Quest headset</a>.</li>
+  <li>Launch a project <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-ide-guide-android#launching-a-project-directly-onto-your-headset">directly</a> onto your headset from the Unreal Editor.</li>
+</ul>
+
+<h2 id="setting-up-a-new-unreal-project-after-installation">Setting up a new Unreal project after installation</h2>
+<p>If you create a new project after setting up the Unreal Engine for Meta Quest development then it is no longer necessary to follow all the above steps. The only steps you need to take are:</p>
+<ul>
+  <li>Go to Edit &gt; Plugins &gt; Meta XR plugin and enable the plugin.</li>
+  <li>Restart the Unreal Editor.</li>
+  <li>Go to Edit &gt; Project Settings &gt; Plugins &gt; Meta XR &gt; Launch Meta XR Project Setup Tool.</li>
+  <li>Click on Apply All for the Required Rules. Do this for all devices you want to develop for.</li>
+  <li>Go to Edit &gt; Project Settings &gt; Platforms &gt; Android</li>
+  <li>Click on Configure Now when you see that your project is not configured for the Android/Google Play services platform.</li>
+  <li>Go to Project Settings &gt; Platforms &gt; Android and enable Package game data inside .apk?</li>
+</ul>
+
+<h2 id="known-issues">Known issues</h2>
+<p><strong>Oculus OpenXR Runtime</strong><br />
+If you read the documentation then you will end up on the <a href="https://developers.meta.com/horizon/documentation/unreal/unreal-link">Use Link for App Development</a> webpage. Under the Configure feature settings for development section it is stated that you need to select <strong>Set Meta Quest Link as active</strong> which sets the Meta Quest Link as the active OpenXR runtime. However, if I did this while the Meta XR plugin is enabled the Unreal Editor kept crashing with the following crash report:</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-28/Crashes/MobileVRMetaQuest3SCrashReporter.png" alt="MobileVRMetaQuest3S Crash Reporter window." title="MobileVRMetaQuest3S Crash Reporter" />
+</div>
+
+<p><a href="https://forums.unrealengine.com/t/error-when-launching-engine/1181504/11">S-ed</a> suggests to use the <code class="language-plaintext highlighter-rouge">-nohmd</code> parameter when starting the engine. This worked for me. However, you will not be able to use the VR Preview in the Unreal Editor despite the fact that your headset is connected to your PC through Meta Quest Link or Air Link. Another option that worked for me is to set SteamVR back as the OpenXR runtime in the SteamVR settings. For this SteamVR needs to be installed on your PC.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-11-28/Crashes/SteamVRSettings.png" alt="SteamVR Settings window." title="SteamVR Settings" />
+</div>
+
+<p><strong>Meta Quest Link Application</strong><br />
+If you’ve used your Meta Quest headset on a different computer before following this tutorial, ensure that Air Link is disabled if the headset and PC are not connected to the same network. In this situation, use a USB-C cable to connect the headset to the PC, and select the Link option in the Meta Quest Link application to detect the headset and complete the setup. If the headset and PC are connected to the same network, you can use the Air Link option in the Meta Quest Link application to detect the headset and finish the setup.</p>
+
+<h2 id="useful-links">Useful links</h2>
+<ul>
+  <li><a href="https://dev.epicgames.com/community/learning/tutorials/y4vB/unreal-engine-5-4-x-for-meta-quest-vr">Unreal Engine 5.4.x for Meta Quest VR</a></li>
+  <li><a href="https://forums.unrealengine.com/t/how-to-game-development-best-practices-for-quest-3-using-unreal-engine-5/2056737">How To: Game Development Best Practices for Quest 3 using Unreal Engine 5</a></li>
+</ul>
+
+</div>
+
+
+<div class="related">
+  <h2>Related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/explanation/oculus-openxr-runtime-conflicts-with-vive-openxr-runtime-on-windows-10">
+            Oculus OpenXR runtime conflicts with Vive OpenXR runtime on Windows 10
+            <small>04 Dec 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-vive-focus-3">
+            How to deploy a mobile VR application to the Vive Focus 3
+            <small>21 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-create-a-networked-c++-actor-in-unreal-engine">
+            How to create a networked C++ actor in Unreal Engine
+            <small>14 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script src='/public/js/script.js'></script>
+  </body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Oculus OpenXR runtime conflicts with Vive OpenXR runtime on Windows 10 &middot; LBVR Games
+    
+  </title>
+
+  
+  <link rel="canonical" href="https://www.lbvrgames.com/explanation/oculus-openxr-runtime-conflicts-with-vive-openxr-runtime-on-windows-10">
+  
+
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/poole.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/syntax.css">
+  <link rel="stylesheet" href="https://www.lbvrgames.com/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <link rel="LBVRGamesIcon" sizes="144x144" href="https://www.lbvrgames.com/public/LBVRGamesIcon.png">
+  <link rel="shortcut icon" href="https://www.lbvrgames.com/public/favicon.ico">
+
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://www.lbvrgames.com/atom.xml">
+
+  
+
+  <script src="/assets/js/copy-button.js"></script>
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <p>Location-Based Virtual Reality enthusiasts building in public and fostering a community of like-minded creators.</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="https://www.lbvrgames.com/">Home</a>
+
+    
+
+    
+    
+      
+    
+      
+        
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/about">About</a>
+        
+      
+    
+      
+    
+      
+        
+          <a class="sidebar-nav-item" href="https://www.lbvrgames.com/documentation">Documentation</a>
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="https://github.com/LBVRGames">GitHub project</a>
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2024. All rights reserved.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">LBVR Games</a>
+            <small>- Welcome to our community</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="post">
+  <h1 class="post-title">Oculus OpenXR runtime conflicts with Vive OpenXR runtime on Windows 10</h1>
+  <span class="post-author">By <a href="https://woutswinkels.github.io/" target="_blank">Wout Swinkels</a></span> - 
+  <span class="post-date">04 Dec 2024</span>
+  <p>When the Oculus OpenXR Runtime is set as active and your Unreal project uses the Meta XR plugin, the following crash report may appear.</p>
+
+<div align="center">
+    <img src="/assets/images/2024-12-04/Crashes/OculusOpenXRRuntimeCrashReporter.png" alt="Oculus OpenXR Runtime Crash Reporter window." title="Oculus OpenXR Runtime Crash Reporter" />
+</div>
+
+<p>For me, the issue lies with the Vive OpenXR runtime, which is part of the Vive Streaming application. This application is used to connect Vive standalone headsets, such as the Vive Focus 3, to your PC (i.e. for PCVR). When I delete the Vive Streaming application, I can start the Unreal project without any issues.</p>
+
+<p>Of course, it would be quite inconvenient to uninstall the Vive Streaming application every time I want to use the Meta Quest and reinstall it when switching back to the Vive Focus 3. Fortunately, there’s another option.</p>
+
+<p>Open the Registry Editor in Windows and navigate to: <span class="break-at-backslash"> Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Khronos\OpenXR\1\ApiLayers\Implicit </span></p>
+
+<p>You should see the following entries:</p>
+
+<div align="center">
+    <img src="/assets/images/2024-12-04/WindowsRegistry/ViveOpenXRRegistryEntries.png" border="1" alt="Vive OpenXR registry entries." title="Vive OpenXR registry entries" />
+</div>
+
+<p>Delete the entry for <span class="break-at-backslash">C:\W\VIVE Business Streaming\OpenXR\ViveVR_openxr\ViveOpenXRMR\ViveOpenXRMR.json </span>. Your Unreal project should now open without any issues.</p>
+
+<h2 id="what-does-the-viveopenxrmr-do">What does the ViveOpenXRMR do?</h2>
+<p><em>ChatGPT generated</em></p>
+
+<p>The ViveOpenXRMR runtime is part of HTC’s OpenXR integration and is designed to enable Mixed Reality (MR) and Virtual Reality (VR) functionalities for HTC devices like the Vive XR Elite and Focus 3. This runtime acts as a bridge between applications built using OpenXR (an open standard for VR/AR development) and the specific hardware features of HTC headsets. The ViveOpenXRMR runtime provides several key functions:</p>
+
+<ol>
+  <li><strong>Controller and Hand Tracking</strong>: It supports interaction profiles for HTC-specific controllers and hand-tracking features.</li>
+  <li><strong>Passthrough and MR Features</strong>: The runtime enables mixed reality features such as passthrough, allowing virtual objects to be placed within the user’s physical environment, similar to what is offered by Meta Quest.</li>
+  <li><strong>Facial and Eye Tracking Extensions</strong>: HTC’s OpenXR runtime includes optional extensions to support advanced features like facial and eye tracking for more immersive applications.</li>
+  <li><strong>System Compatibility</strong>: It integrates with HTC’s VIVE SRanipal system and other tools to optimize performance and ensure compatibility with HTC’s ecosystem​.</li>
+</ol>
+
+<p>When you see references to this runtime in your logs, it indicates that the system is recognizing it as the active OpenXR runtime, even if you’re developing for another platform like Meta Quest. This might lead to compatibility issues, so it’s crucial to ensure the correct OpenXR runtime is selected based on your target hardware.</p>
+
+<p><strong>ChatGPT sources</strong></p>
+<ol>
+  <li>Vive Developers - How to Use SR_Runtime - Developer Resources [<a href="https://developer.vive.com/resources/openxr/openxr-pcvr/tutorials/how-use-sr_runtime/">link</a>]</li>
+  <li>Vive Wave - Build Unreal Engine 5 OpenXR Applications on VIVE XR Devices [<a href="https://dl.vive.com/SDK/openxr/openXRforAIO/[ViveFocus3]Build_UE5_OpenXR_for_Wave_Runtime_v1.0.5.pdf">link</a>]</li>
+  <li>Vive Developers - Overview: OpenXR for PC - Developer Resources [<a href="https://developer.vive.com/resources/openxr/openxr-pcvr/overview/">link</a>]</li>
+  <li>Vive Download - Unity Tutorials | Vive OpenXR - Developer Resources [<a href="https://developer.vive.com/resources/openxr/unity/tutorials/">link</a>]</li>
+</ol>
+
+</div>
+
+
+<div class="related">
+  <h2>Related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-meta-quest-3s">
+            How to deploy a mobile VR application to the Meta Quest 3S
+            <small>28 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-deploy-a-mobile-vr-application-to-the-vive-focus-3">
+            How to deploy a mobile VR application to the Vive Focus 3
+            <small>21 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/how-to/how-to-create-a-networked-c++-actor-in-unreal-engine">
+            How to create a networked C++ actor in Unreal Engine
+            <small>14 Nov 2024</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script src='/public/js/script.js'></script>
+  </body>
+</html>
